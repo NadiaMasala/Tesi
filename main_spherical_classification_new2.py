@@ -83,6 +83,7 @@ plt.show()
 m = X.shape[0]
 n = X.shape[1]
 
+#scrivere nel fit da qui
 distancesA = {}
 for i in range(A.shape[0]):
     distancesA[i] = np.linalg.norm(C_a - A[i])
@@ -96,6 +97,7 @@ dB_min = min(distancesB.values())
 dB_max = max(distancesB.values())
 d_min = max(dA_min,dB_min)
 d_max = min(dA_max,dB_max)
+#a qui
 
 # Splitting the dataset in training set e test set
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
