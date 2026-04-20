@@ -15,8 +15,8 @@ from New_Helper_SC import *
 n_features = 2
 
 # Creation of a casual dataset with 2 clusters
-X, y = make_blobs(n_samples=20, centers=2, n_features=n_features, cluster_std=0.6)
-y = label_binarize(y, classes=[0,1], neg_label=2, pos_label=7)
+X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.6)
+#y = label_binarize(y, classes=[0,1], neg_label=2, pos_label=7)
 
 m = X.shape[0]
 n = X.shape[1]

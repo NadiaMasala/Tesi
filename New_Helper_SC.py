@@ -35,7 +35,7 @@ def new_spherical_class_fit_semidef(X, y, epsilon, C1, C2):
     objective = cp.Maximize(obj)
 
     prob = cp.Problem(objective,constr)
-    res = prob.solve(solver = cp.MOSEK, verbose = 0)
+    res = prob.solve(solver = cp.MOSEK, verbose = 1)
 
     # Solutions
     Q_star = Q.value
@@ -93,7 +93,7 @@ def new_spherical_class_fit_semidef2(X, y, epsilon, C1, C2):
     objective = cp.Maximize(obj)
 
     prob = cp.Problem(objective, constr)
-    res = prob.solve(solver=cp.MOSEK, verbose=0)
+    res = prob.solve(solver=cp.MOSEK, verbose=1)
 
     # Solutions
     Q_tilde_star = Q_tilde.value
