@@ -84,21 +84,22 @@ B = np.concatenate((B, A_extra))
 m = X.shape[0]
 n = X.shape[1]
 
-# Definition of the barycenter of all points
-barycenter = np.zeros(n)
-for j in range(n):
-    barycenter[j] = np.mean(X[:, j])
+# Splitting the dataset in training set e test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Definition of the barycenter of training points
+barycenter = np.zeros(X_train.shape[1])
+for j in range(X_train.shape[1]):
+    barycenter[j] = np.mean(X_train[:, j])
 
 distances = {}
-for i in range(m):
-    distances[i] = np.linalg.norm(barycenter - X[i])
+for i in range(X_train.shape[0]):
+    distances[i] = np.linalg.norm(barycenter - X_train[i])
 
 d_min = min(distances.values())
 d_max = max(distances.values())
 
-# Splitting the dataset in training set e test set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
+# Selection of values of hyperparameters by Grid Search
 epsilon_par = list(np.linspace(d_min,d_max,5))
 #C1_par = [2, 5, 10, 15, 20]  # come scelgo i valori che possono assumere gli iperparametri?
 # or try inside the interval [1e-4, 1e+4]

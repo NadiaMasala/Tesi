@@ -74,33 +74,49 @@ A = np.concatenate((A, B_extra))
 B = np.concatenate((B, A_extra))
 
 # Original plot 2D
-figure, axes = plt.subplots()
-axes.scatter(A[:,0], A[:,1], facecolor = "None", edgecolor = "b", s = 50, label='A')
-axes.scatter(B[:,0], B[:,1], facecolor = "None", edgecolor = "r", s = 50, label='B')
-plt.show()
+#figure, axes = plt.subplots()
+#axes.scatter(A[:,0], A[:,1], facecolor = "None", edgecolor = "b", s = 50, label='A')
+#axes.scatter(B[:,0], B[:,1], facecolor = "None", edgecolor = "r", s = 50, label='B')
+#plt.show()
 
 # New dataset dimensions
 m = X.shape[0]
 n = X.shape[1]
 
-#scrivere nel fit da qui
-distancesA = {}
-for i in range(A.shape[0]):
-    distancesA[i] = np.linalg.norm(C_a - A[i])
-distancesB = {}
-for j in range(B.shape[0]):
-    distancesB[j] = np.linalg.norm(C_b - B[j])
-
-dA_min = min(distancesA.values())
-dA_max = max(distancesA.values())
-dB_min = min(distancesB.values())
-dB_max = max(distancesB.values())
-d_min = max(dA_min,dB_min)
-d_max = min(dA_max,dB_max)
-#a qui
-
 # Splitting the dataset in training set e test set
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Splitting training classes by their labels
+A_train = []
+B_train = []
+for i in range(X_train.shape[0]):
+    if y[i] == labels[0]:
+        A_train.append(X_train[i])
+    elif y[i] == labels[1]:
+        B_train.append(X_train[i])
+A_train = np.array(A_train)
+B_train = np.array(B_train)
+
+# Defining training classes centroids
+cA_train = np.zeros(A_train.shape[1])
+cB_train = np.zeros(B_train.shape[1])
+for j in range(X_train.shape[1]):
+    cA_train[j] = np.mean(A_train[:, j])
+    cB_train[j] = np.mean(B_train[:, j])
+
+dA_train = {}
+for i in range(A_train.shape[0]):
+    dA_train[i] = np.linalg.norm(cA_train - A_train[i])
+dB_train = {}
+for j in range(B_train.shape[0]):
+    dB_train[j] = np.linalg.norm(cB_train - B_train[j])
+
+dA_min = min(dA_train.values())
+dA_max = max(dA_train.values())
+dB_min = min(dB_train.values())
+dB_max = max(dB_train.values())
+d_min = max(dA_min, dB_min)
+d_max = min(dA_max, dB_max)
 
 epsilon_par = list(np.linspace(d_min,d_max,5))
 minpts_par = [3, 5, 10, 15, 20]

@@ -139,6 +139,8 @@ def class_in_selection(X, y, epsilon):
             A.append(X[i])
         elif y[i] == labels[1]:
             B.append(X[i])
+    A = np.array(A)
+    B = np.array(B)
 
     # Definition of the barycenter of all points
     barycenter = np.zeros(n)
@@ -170,7 +172,7 @@ def class_in_selection(X, y, epsilon):
         in_label = labels[1]
         out_label = labels[0]
 
-    return np.array(in_class), np.array(out_class), in_label, out_label
+    return in_class, out_class, in_label, out_label
 
 # Function 2 for selection of class in the sphere
 def class_in_selection2(X, y, epsilon, minpts):
