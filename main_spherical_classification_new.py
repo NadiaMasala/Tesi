@@ -103,10 +103,10 @@ d_max = max(distances.values())
 epsilon_par = list(np.linspace(d_min,d_max,5))
 #C1_par = [2, 5, 10, 15, 20]  # come scelgo i valori che possono assumere gli iperparametri?
 # or try inside the interval [1e-4, 1e+4]
-C1_par = list(np.linspace(1e-4, 1e+4, 5))
+C1_par = list(np.linspace(1e0, 1e+4, 5))
 #C2_par = [2, 5, 10, 15, 20]  # come scelgo i valori che possono assumere gli iperparametri?
 # or try inside the interval [1e-4, 1e+4]
-C2_par = list(np.linspace(1e-4, 1e+4, 5))
+C2_par = list(np.linspace(1e0, 1e+4, 5))
 center_par = ['fixed','free']
 selected_parameters = {'epsilon':epsilon_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
 sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=10, verbose = 10, n_jobs = 10)

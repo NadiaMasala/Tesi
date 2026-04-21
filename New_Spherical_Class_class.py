@@ -1,4 +1,4 @@
-# Spherical Classifier with selection of class of label '-1'
+# Spherical Classifier with selection of class in the sphere
 
 from sklearn.base import BaseEstimator , ClassifierMixin
 from New_Helper_SC import *
