@@ -71,10 +71,10 @@ def new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2):
     # Definition of constraints
     model.constr = pyo.ConstraintList()
     for k in model.M_in:
-        expr = sum(X_in[k,i] * model.Q[i,j] * X_in[j,k] for i,j in model.N)
+        expr = sum(X_in[k,i] * model.Q[i,j] * X_in[k,j] for i,j in model.N)
         model.constr.add(expr <= 1 + model.xi_in[k])
     for k in model.M_out:
-        expr = sum(X_out[k,i] * model.Q[i,j] * X_out[j,k] for i,j in model.N)
+        expr = sum(X_out[k,i] * model.Q[i,j] * X_out[k,j] for i,j in model.N)
         model.constr.add(expr >= 1 - model.xi_out[k])
     for i in model.N:
         for j in model.N:
@@ -82,13 +82,13 @@ def new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2):
     model.constr.add(model.Q >> 0)
 
     # Objective function and optimization problem
-    obj = model.Q[0,0] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
-    objective = pyo.Objective(obj, sense=pyo.maximize)
+    f_obj = model.Q[0,0] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
+    model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
 
     opt = pyo.SolverFactory('MOSEK')
     #opt = pyo.SolverFactory('ipopt')
-    res_obj = obj.solve(model, tee = True)
-    model.display()
+    res_obj = opt.solve(model, tee = True)
+    model.pprint()
 
     # Solutions
     Q_star = model.Q.value
@@ -159,6 +159,80 @@ def new_spherical_class_fit_semidef2(X, y, epsilon, C1, C2):
     r_star = np.sqrt(1 / Q_star[0, 0])
     xi_in_star = xi_in.value
     xi_out_star = xi_out.value
+
+    X_in = np.delete(Xx_in,0,1)
+    X_out = np.delete(Xx_out, 0, 1)
+
+    return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
+
+def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
+    m = X.shape[0]
+    n = X.shape[1]
+
+    # New points in R^(n+1)
+    Xx = np.hstack((np.ones((m, 1)), X))  # (m,n+1)
+    nn = Xx.shape[1]
+
+    # Selection of class in
+    Xx_in, Xx_out, in_label, out_label = class_in_selection(Xx, y, epsilon)
+    m_in = Xx_in.shape[0]
+    m_out = Xx_out.shape[0]
+
+    # Definition of variables
+    model = pyo.ConcreteModel()
+    model.M = pyo.RangeSet(m)
+    model.N = pyo.RangeSet(n)
+    model.NN = pyo.RangeSet(nn)
+    model.NN2 = pyo.SetRange(2,nn)
+    model.M_in = pyo.RangeSet(m_in)
+    model.M_out = pyo.RangeSet(m_out)
+    model.Q_tilde = pyo.Var(model.NN, model.NN, symmetric=True)
+    for i in model.NN:
+        for j in model.NN:
+            model.Q_tilde[i, j] = pyo.Var()
+    model.F = pyo.Var(model.N, model.N, symmetric=True)  # non capisco se devo mettere all'inizio dimensioni o insieme di valori possibili per le entrate
+    for i in model.NN2:
+        for j in model.NN2:
+            model.F[i-1,j-1] = model.Q_tilde[i,j]
+    model.xi_in = pyo.Var(model.M_in, bounds=(0, None))
+    model.xi_out = pyo.Var(model.M_out, bounds=(0, None))
+
+    # Definition of constraints
+    model.constr = pyo.ConstraintList()
+    for k in model.M_in:
+        expr = sum(Xx_in[k, i] * model.Q_tilde[i, j] * Xx_in[k, j] for i, j in model.NN)
+        model.constr.add(expr <= 1 + model.xi_in[k])
+    for k in model.M_out:
+        expr = sum(Xx_out[k, i] * model.Q_tilde[i, j] * Xx_out[k, j] for i, j in model.NN)
+        model.constr.add(expr >= 1 - model.xi_out[k])
+    for i in model.N:
+        for j in model.N:
+            model.constr.add(model.F[i, j] == 0 if i != j else model.F[i, i] == model.F[j, j])
+    model.constr.add(model.Q_tilde >> 0)
+
+    # Objective function and optimization problem
+    f_obj = model.Q_tilde[0, 0] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
+    model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
+
+    opt = pyo.SolverFactory('MOSEK')
+    # opt = pyo.SolverFactory('ipopt')
+    res_obj = opt.solve(model, tee=True)
+    model.pprint()
+
+    # Solutions
+    Q_tilde_star = model.Q_tilde.value
+    F_star = model.F.value
+
+    t_star = Q_tilde_star[0, 1:]
+    s_star = Q_tilde_star[0, 0]
+    c_star = - np.linalg.inv(F_star) @ t_star  # optimal center of the sphere
+    delta_star = s_star - sum(c_star[i]*F_star[i,j]*c_star[j] for i,j in model.NN2)
+
+    Q_star = F_star / (1 - delta_star)
+    r_star = np.sqrt(1 / Q_star[0, 0])
+    xi_in_star = model.xi_in.value
+    xi_out_star = model.xi_out.value
+
 
     X_in = np.delete(Xx_in,0,1)
     X_out = np.delete(Xx_out, 0, 1)
