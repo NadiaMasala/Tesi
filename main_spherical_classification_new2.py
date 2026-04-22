@@ -16,8 +16,6 @@ n_features = 2
 
 # Creation of a casual dataset with 2 clusters
 X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.6)
-#y = label_binarize(y, classes=[0,1], neg_label=2, pos_label=7)
-
 m = X.shape[0]
 n = X.shape[1]
 
@@ -72,12 +70,6 @@ X = np.concatenate((X, A_extra, B_extra))
 y = np.concatenate((y.ravel(), y_A_extra, y_B_extra))
 A = np.concatenate((A, B_extra))
 B = np.concatenate((B, A_extra))
-
-# Original plot 2D
-#figure, axes = plt.subplots()
-#axes.scatter(A[:,0], A[:,1], facecolor = "None", edgecolor = "b", s = 50, label='A')
-#axes.scatter(B[:,0], B[:,1], facecolor = "None", edgecolor = "r", s = 50, label='B')
-#plt.show()
 
 # New dataset dimensions
 m = X.shape[0]

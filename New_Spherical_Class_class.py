@@ -21,23 +21,23 @@ class New_Spherical_Classifier( BaseEstimator , ClassifierMixin ) :
         self.labels_ = labels
 
         if self.center == 'fixed':
-            r, xi_neg, xi_pos, in_class, out_class, in_label, out_label = new_spherical_class_fit_semidef(self.X_, self.y_, self.epsilon, self.C1, self.C2)
-            #r, xi_neg, xi_pos, in_class, out_class, in_label, out_label = new2_spherical_class_fit_semidef(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
+            r, xi_in, xi_out, in_class, out_class, in_label, out_label = new_spherical_class_fit_semidef(self.X_, self.y_, self.epsilon, self.C1, self.C2)
+            #r, xi_in, xi_out, in_class, out_class, in_label, out_label = new2_spherical_class_fit_semidef(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
             self.r_ = r
             self.c_ = np.zeros(self.X_.shape[1])
-            self.xi_neg_ = xi_neg
-            self.xi_pos_ = xi_pos
+            self.xi_in_ = xi_in
+            self.xi_out_ = xi_out
             self.in_class_ = in_class
             self.out_class_ = out_class
             self.in_label_ = in_label
             self.out_label_ = out_label
         elif self.center == 'free':
-            r, c, xi_neg, xi_pos, in_class, out_class, in_label, out_label = new_spherical_class_fit_semidef2(self.X_, self.y_, self.epsilon, self.C1, self.C2)
-            #r, c, xi_neg, xi_pos, in_class, out_class, in_label, out_label = new2_spherical_class_fit_semidef2(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
+            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = new_spherical_class_fit_semidef2(self.X_, self.y_, self.epsilon, self.C1, self.C2)
+            #r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = new2_spherical_class_fit_semidef2(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
             self.r_ = r
             self.c_ = c
-            self.xi_neg_ = xi_neg
-            self.xi_pos_ = xi_pos
+            self.xi_in_ = xi_in
+            self.xi_out_ = xi_out
             self.in_class_ = in_class
             self.out_class_ = out_class
             self.in_label_ = in_label
