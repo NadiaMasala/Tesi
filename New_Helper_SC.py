@@ -82,7 +82,7 @@ def new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2):
     model.constr.add(model.Q >> 0)
 
     # Objective function and optimization problem
-    f_obj = model.Q[0,0] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
+    f_obj = model.Q[1,1] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
     model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
 
     opt = pyo.SolverFactory('MOSEK')
@@ -92,7 +92,7 @@ def new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2):
 
     # Solutions
     Q_star = model.Q.value
-    r_star = np.sqrt(1/Q_star[0,0])
+    r_star = np.sqrt(1/Q_star[1,1])
     xi_in_star = model.xi_in.value
     xi_out_star = model.xi_out.value
 
@@ -211,7 +211,7 @@ def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
     model.constr.add(model.Q_tilde >> 0)
 
     # Objective function and optimization problem
-    f_obj = model.Q_tilde[0, 0] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
+    f_obj = model.Q_tilde[1, 1] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
     model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
 
     opt = pyo.SolverFactory('MOSEK')
@@ -222,14 +222,14 @@ def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
     # Solutions
     Q_tilde_star = model.Q_tilde.value
     F_star = model.F.value
+    t_star = Q_tilde_star[1, 2:]
+    s_star = Q_tilde_star[1, 1]
 
-    t_star = Q_tilde_star[0, 1:]
-    s_star = Q_tilde_star[0, 0]
     c_star = - np.linalg.inv(F_star) @ t_star  # optimal center of the sphere
-    delta_star = s_star - sum(c_star[i]*F_star[i,j]*c_star[j] for i,j in model.NN2)
 
-    Q_star = F_star / (1 - delta_star)
-    r_star = np.sqrt(1 / Q_star[0, 0])
+    delta_star = s_star - sum(c_star[i]*F_star[i,j]*c_star[j] for i,j in model.N)
+    Q_star = (F_star[i,j] / (1 - delta_star) for i,j in model.N)
+    r_star = np.sqrt(1 / Q_star[1,1])
     xi_in_star = model.xi_in.value
     xi_out_star = model.xi_out.value
 
