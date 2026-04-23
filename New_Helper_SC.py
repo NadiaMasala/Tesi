@@ -2,6 +2,7 @@
 
 import numpy as np
 import cvxpy as cp
+import sys
 import mosek
 from   mosek.fusion import *
 from sklearn.preprocessing import label_binarize
@@ -58,40 +59,38 @@ def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
 
     # Definition of variables
     with Model("model") as M:
-        Q = M.variable(Domain.inPSDCone(n,n))
-        xi_in = M.variable(Domain.greaterThan(0))
-        xi_out = M.variable(Domain.greaterThan(0))
+        Q = M.variable(Domain.inPSDCone(n))
+        xi_in = M.variable(Domain.greaterThan(0.0))
+        xi_out = M.variable(Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.sub(Expr.sub(Q[0, 0], C1 * Expr.sum(xi_in)), C2 * Expr.sum(xi_out))
+        f_obj = Expr.sub(Expr.sub(Q.index(0,0), Expr.dot(C1, Expr.sum(xi_in))), Expr.dot(C2, Expr.sum(xi_out)))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
         # Definition of constraints
         for i in range(m_in):
             xxt = Expr.dot(X_in[i],X_in[i])
             expr = Expr.dot(xxt,Q)
-            M.constraint(expr <= Expr.add(1, xi_in[i]))
+            M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
             xxt = Expr.dot(X_out[i],X_out[i])
             expr = Expr.dot(xxt,Q)
-            M.constraint(expr >= Expr.sub(1, xi_out[i]))
+            M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
             for j in range(n):
-                M.constraint(Q[i,j] == 0 if i!=j else Q[i,i] == Q[j,j])
+                if i!=j:
+                    M.constraint(Q.index(i,j), Domain.equalsTo(0.0))
+                else:
+                    M.constraint(Expr.sub(Q.index(i,i), Q.index(j,j)), Domain.equalsTo(0.0))
 
-        opt = pyo.SolverFactory('MOSEK')
-        #opt = pyo.SolverFactory('ipopt')
-        res_obj = opt.solve(model, tee = True)
-        model.pprint()
+        M.setLogHandler(sys.stdout)
+        M.solve()
 
         # Solutions
-        Q_star = np.zeros(n, n)
-        for i in range(n):
-            for j in range(n):
-                Q_star[i,j] = pyo.value(model.Q[i,j])
+        Q_star = Q.level()
         r_star = np.sqrt(1/Q_star[0,0])
-        xi_in_star = np.array([pyo.value(model.xi_in[i]) for i in range(m_in)])
-        xi_out_star = np.array([pyo.value(model.xi_out[i]) for i in range(m_out)])
+        xi_in_star = xi_in.level()
+        xi_out_star = xi_out.level()
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 

@@ -35,5 +35,5 @@ epsilon = np.mean([d_min,d_max])
 C1 = 1e-4
 C2 = 1e-4
 
-r, xi_in, xi_out, X_in, X_out, in_label, out_label = new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2)
+r, xi_in, xi_out, X_in, X_out, in_label, out_label = new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2)
 print('class in = '+str(in_label), 'class out = '+str(out_label), 'optimal radius = '+str(r), 'optimal xi_in = '+str(xi_in), 'optimal xi_out = '+str(xi_out))
