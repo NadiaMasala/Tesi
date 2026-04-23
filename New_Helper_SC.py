@@ -190,7 +190,7 @@ def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
     for i in model.NN:
         for j in model.NN:
             model.Q_tilde[i, j] = pyo.Var()
-    model.F = pyo.Var(model.N, model.N, symmetric=True)  # non capisco se devo mettere all'inizio dimensioni o insieme di valori possibili per le entrate
+    model.F = pyo.Var(model.N, model.N, symmetric=True)  # ? all'inizio dimensioni o insieme di valori possibili per le entrate
     for i in model.NN2:
         for j in model.NN2:
             model.F[i-1,j-1] = model.Q_tilde[i,j]
@@ -224,7 +224,9 @@ def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
     F_star = model.F.value
     t_star = Q_tilde_star[1, 2:]
     s_star = Q_tilde_star[1, 1]
-    c_star = - sum((1/F_star[i,i])*t_star[i] for i in model.N)  # optimal center of the sphere
+    c_star = []  # optimal center of the sphere
+    for i in model.N:
+        c_star[i] = - (1/F_star[i,i])*t_star[i]
     delta_star = s_star - sum(c_star[i]*F_star[i,j]*c_star[j] for i,j in model.N)
     Q_star = (F_star[i,j] / (1 - delta_star) for i,j in model.N)
     r_star = np.sqrt(1 / Q_star[1,1])
