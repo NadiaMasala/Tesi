@@ -2,7 +2,8 @@
 
 import numpy as np
 import cvxpy as cp
-import pyomo.environ as pyo
+import mosek
+from   mosek.fusion import *
 from sklearn.preprocessing import label_binarize
 
 # Fit with fixed center in the origin
@@ -46,55 +47,51 @@ def new_spherical_class_fit_semidef(X, y, epsilon, C1, C2):
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def new_spherical_class_fit_semidef_pyomo(X, y, epsilon, C1, C2):
+def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
     #Selection of class in
     X_in, X_out, in_label, out_label = class_in_selection(X, y, epsilon)
-    m_in =X_in.shape[0]
+    m_in = X_in.shape[0]
     m_out = X_out.shape[0]
 
     # Definition of variables
-    model = pyo.ConcreteModel()
-    model.M = pyo.RangeSet(m)
-    model.N = pyo.RangeSet(n)
-    model.M_in = pyo.RangeSet(m_in)
-    model.M_out = pyo.RangeSet(m_out)
-    model.Q = pyo.Var(model.N, model.N, symmetric = True)
-    for i in model.N:
-        for j in model.N:
-            model.Q[i,j] = pyo.Var()
-    model.xi_in = pyo.Var(model.M_in, bounds = (0, None))
-    model.xi_out = pyo.Var(model.M_out, bounds = (0, None))
+    with Model("model") as M:
+        Q = M.variable(Domain.inPSDCone(n,n))
+        xi_in = M.variable(Domain.greaterThan(0))
+        xi_out = M.variable(Domain.greaterThan(0))
 
-    # Definition of constraints
-    model.constr = pyo.ConstraintList()
-    for k in model.M_in:
-        expr = sum(X_in[k,i] * model.Q[i,j] * X_in[k,j] for i,j in model.N)
-        model.constr.add(expr <= 1 + model.xi_in[k])
-    for k in model.M_out:
-        expr = sum(X_out[k,i] * model.Q[i,j] * X_out[k,j] for i,j in model.N)
-        model.constr.add(expr >= 1 - model.xi_out[k])
-    for i in model.N:
-        for j in model.N:
-            model.constr.add(model.Q[i,j] == 0 if i!=j else model.Q[i,i] == model.Q[j,j])
-    model.constr.add(model.Q >> 0)
+        # Definition of constraints
+        model.constr = pyo.ConstraintList()
+        for k in model.M_in:
+            expr = sum(X_in[k,i] * model.Q[i,j] * X_in[k,j] for i in model.N for j in model.N)
+            model.constr.add(expr <= 1 + model.xi_in[k])
+        for k in model.M_out:
+            expr = sum(X_out[k,i] * model.Q[i,j] * X_out[k,j] for i in model.N for j in model.N)
+            model.constr.add(expr >= 1 - model.xi_out[k])
+        for i in model.N:
+            for j in model.N:
+                model.constr.add(model.Q[i,j] == 0 if i!=j else model.Q[i,i] == model.Q[j,j])
+        model.constr.add(model.Q >> 0)
 
-    # Objective function and optimization problem
-    f_obj = model.Q[1,1] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
-    model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
+        # Objective function and optimization problem
+        f_obj = Expr.sub(Expr.sub(Q[0,0], C1 * Expr.sum(xi_in)), C2 * Expr.sum(xi_out))
+        M.objective(ObjectiveSense.Maximize, f_obj)
 
-    opt = pyo.SolverFactory('MOSEK')
-    #opt = pyo.SolverFactory('ipopt')
-    res_obj = opt.solve(model, tee = True)
-    model.pprint()
+        opt = pyo.SolverFactory('MOSEK')
+        #opt = pyo.SolverFactory('ipopt')
+        res_obj = opt.solve(model, tee = True)
+        model.pprint()
 
-    # Solutions
-    Q_star = model.Q.value
-    r_star = np.sqrt(1/Q_star[1,1])
-    xi_in_star = model.xi_in.value
-    xi_out_star = model.xi_out.value
+        # Solutions
+        Q_star = np.zeros(n, n)
+        for i in range(n):
+            for j in range(n):
+                Q_star[i,j] = pyo.value(model.Q[i,j])
+        r_star = np.sqrt(1/Q_star[0,0])
+        xi_in_star = np.array([pyo.value(model.xi_in[i]) for i in range(m_in)])
+        xi_out_star = np.array([pyo.value(model.xi_out[i]) for i in range(m_out)])
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
