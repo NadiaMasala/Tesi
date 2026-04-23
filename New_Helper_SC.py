@@ -62,22 +62,22 @@ def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
         xi_in = M.variable(Domain.greaterThan(0))
         xi_out = M.variable(Domain.greaterThan(0))
 
-        # Definition of constraints
-        model.constr = pyo.ConstraintList()
-        for k in model.M_in:
-            expr = sum(X_in[k,i] * model.Q[i,j] * X_in[k,j] for i in model.N for j in model.N)
-            model.constr.add(expr <= 1 + model.xi_in[k])
-        for k in model.M_out:
-            expr = sum(X_out[k,i] * model.Q[i,j] * X_out[k,j] for i in model.N for j in model.N)
-            model.constr.add(expr >= 1 - model.xi_out[k])
-        for i in model.N:
-            for j in model.N:
-                model.constr.add(model.Q[i,j] == 0 if i!=j else model.Q[i,i] == model.Q[j,j])
-        model.constr.add(model.Q >> 0)
-
         # Objective function and optimization problem
-        f_obj = Expr.sub(Expr.sub(Q[0,0], C1 * Expr.sum(xi_in)), C2 * Expr.sum(xi_out))
+        f_obj = Expr.sub(Expr.sub(Q[0, 0], C1 * Expr.sum(xi_in)), C2 * Expr.sum(xi_out))
         M.objective(ObjectiveSense.Maximize, f_obj)
+
+        # Definition of constraints
+        for i in range(m_in):
+            xxt = Expr.dot(X_in[i],X_in[i])
+            expr = Expr.dot(xxt,Q)
+            M.constraint(expr <= Expr.add(1, xi_in[i]))
+        for i in range(m_out):
+            xxt = Expr.dot(X_out[i],X_out[i])
+            expr = Expr.dot(xxt,Q)
+            M.constraint(expr >= Expr.sub(1, xi_out[i]))
+        for i in range(n):
+            for j in range(n):
+                M.constraint(Q[i,j] == 0 if i!=j else Q[i,i] == Q[j,j])
 
         opt = pyo.SolverFactory('MOSEK')
         #opt = pyo.SolverFactory('ipopt')
