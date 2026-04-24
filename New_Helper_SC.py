@@ -59,29 +59,37 @@ def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
 
     # Definition of variables
     with Model("model") as M:
+        c1 = M.parameter()
+        c1.setValue(C1)
+        c2 = M.parameter()
+        c2.setValue(C2)
+
+        X_in = Matrix.dense(X_in)
+        X_out = Matrix.dense(X_out)
+
         Q = M.variable(Domain.inPSDCone(n))
         xi_in = M.variable(Domain.greaterThan(0.0))
         xi_out = M.variable(Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.sub(Expr.sub(Q.index(0,0), Expr.dot(C1, Expr.sum(xi_in))), Expr.dot(C2, Expr.sum(xi_out)))
+        f_obj = Expr.sub(Expr.sub(Q.index([0, 0]), Expr.mul(c1, Expr.sum(xi_in))), Expr.mul(c2, Expr.sum(xi_out)))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
         # Definition of constraints
         for i in range(m_in):
-            xxt = Expr.dot(X_in[i],X_in[i])
+            xxt = Expr.dot(X_in.pick([i,0],[i,n-1]), X_in.pick([i,0],[i,n-1]))
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
-            xxt = Expr.dot(X_out[i],X_out[i])
+            xxt = Expr.dot(X_out.slice([i,0],[i,n-1]), X_out.slice([i,0],[i,n-1]))
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
             for j in range(n):
                 if i!=j:
-                    M.constraint(Q.index(i,j), Domain.equalsTo(0.0))
+                    M.constraint(Q.index([i,j]), Domain.equalsTo(0.0))
                 else:
-                    M.constraint(Expr.sub(Q.index(i,i), Q.index(j,j)), Domain.equalsTo(0.0))
+                    M.constraint(Expr.sub(Q.index([i,i]), Q.index([j,j])), Domain.equalsTo(0.0))
 
         M.setLogHandler(sys.stdout)
         M.solve()
