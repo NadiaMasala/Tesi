@@ -1,4 +1,4 @@
-# Main for Spherical Classification  with selection of class in the optimal sphere
+# Main for Spherical Classification with selection of class in the optimal sphere
 # Synthetic datasets
 
 import math
