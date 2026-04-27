@@ -13,8 +13,10 @@ from sklearn.metrics import classification_report, accuracy_score
 from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 
-n_samples = [100, 200, 300]
-n_features = [2, 10, 40]
+#n_samples = [100, 200, 300]
+n_samples = [300]
+#n_features = [2, 10, 40]
+n_features = [40]
 
 for ns in n_samples:
     for nf in n_features:
