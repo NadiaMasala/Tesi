@@ -1,4 +1,5 @@
-# Main for Spherical Classifier with selection of class in the optimal sphere
+# Main for Spherical Classification  with selection of class in the optimal sphere
+# Synthetic datasets
 
 import math
 import matplotlib
@@ -12,7 +13,12 @@ from sklearn.metrics import classification_report, accuracy_score
 from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 
-n_features = 2
+n_samples = [100, 200, 300]
+n_features = [2, 10, 40]
+
+for i in n_samples:
+    for j in n_features:
+        
 
 # Creation of a casual dataset with 2 clusters
 X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.6)

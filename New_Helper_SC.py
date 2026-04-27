@@ -48,7 +48,7 @@ def new_spherical_class_fit_semidef(X, y, epsilon, C1, C2):
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
+def spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -64,25 +64,22 @@ def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
         c2 = M.parameter()
         c2.setValue(C2)
 
-        X_in = Matrix.dense(X_in)
-        X_out = Matrix.dense(X_out)
-
         Q = M.variable(Domain.inPSDCone(n))
-        xi_in = M.variable(Domain.greaterThan(0.0))
-        xi_out = M.variable(Domain.greaterThan(0.0))
+        xi_in = M.variable(m_in, Domain.greaterThan(0.0))
+        xi_out = M.variable(m_out, Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.sub(Expr.sub(Q.index([0, 0]), Expr.mul(c1, Expr.sum(xi_in))), Expr.mul(c2, Expr.sum(xi_out)))
+        f_obj = Expr.sub(Q.index([0, 0]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
         # Definition of constraints
         for i in range(m_in):
-            xxt = Expr.dot(X_in.pick([i,0],[i,n-1]), X_in.pick([i,0],[i,n-1]))
+            xxt = X_in[i].reshape((1,n)) @ X_in[i].reshape((n,1))
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
-            xxt = Expr.dot(X_out.slice([i,0],[i,n-1]), X_out.slice([i,0],[i,n-1]))
-            expr = Expr.dot(xxt,Q)
+            xxt = X_out[i].reshape((n,1)) @ X_out[i].reshape((1,n))
+            expr = Expr.dot(xxt, Q)
             M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
             for j in range(n):
@@ -95,7 +92,7 @@ def new_spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
         M.solve()
 
         # Solutions
-        Q_star = Q.level()
+        Q_star = np.reshape(Q.level(),(n,n))
         r_star = np.sqrt(1/Q_star[0,0])
         xi_in_star = xi_in.level()
         xi_out_star = xi_out.level()
@@ -132,7 +129,7 @@ def new_spherical_class_fit_semidef2(X, y, epsilon, C1, C2):
     xi_in = cp.Variable(Xx_in.shape[0])
     xi_out = cp.Variable(Xx_out.shape[0])
 
-    # Definition fo constraints
+    # Definition of constraints
     constr = []
     for i in range(Xx_in.shape[0]):
         constr += [Xx_in[i] @ Q_tilde @ Xx_in[i].T <= 1 + xi_in[i], xi_in[i] >= 0]
@@ -169,76 +166,68 @@ def new_spherical_class_fit_semidef2(X, y, epsilon, C1, C2):
 
     return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def new_spherical_class_fit_semidef2_pyomo(X, y, epsilon, C1, C2):
+def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
     # New points in R^(n+1)
-    Xx = np.hstack((np.ones((m, 1)), X))  # (m,n+1)
-    nn = Xx.shape[1]
+    Xx = np.hstack((np.ones((m, 1)), X))
 
     # Selection of class in
-    Xx_in, Xx_out, in_label, out_label = class_in_selection(Xx, y, epsilon)
+    Xx_in, Xx_out, in_label, out_label = my_class_in_selection(Xx, y, epsilon, minpts)
     m_in = Xx_in.shape[0]
     m_out = Xx_out.shape[0]
 
-    # Definition of variables
-    model = pyo.ConcreteModel()
-    model.M = pyo.RangeSet(m)
-    model.N = pyo.RangeSet(n)
-    model.NN = pyo.RangeSet(nn)
-    model.NN2 = pyo.SetRange(2,nn)
-    model.M_in = pyo.RangeSet(m_in)
-    model.M_out = pyo.RangeSet(m_out)
-    model.Q_tilde = pyo.Var(model.NN, model.NN, symmetric=True)
-    for i in model.NN:
-        for j in model.NN:
-            model.Q_tilde[i, j] = pyo.Var()
-    model.F = pyo.Var(model.N, model.N, symmetric=True)  # ? all'inizio dimensioni o insieme di valori possibili per le entrate
-    for i in model.NN2:
-        for j in model.NN2:
-            model.F[i-1,j-1] = model.Q_tilde[i,j]
-    model.xi_in = pyo.Var(model.M_in, bounds=(0, None))
-    model.xi_out = pyo.Var(model.M_out, bounds=(0, None))
 
-    # Definition of constraints
-    model.constr = pyo.ConstraintList()
-    for k in model.M_in:
-        expr = sum(Xx_in[k, i] * model.Q_tilde[i, j] * Xx_in[k, j] for i, j in model.NN)
-        model.constr.add(expr <= 1 + model.xi_in[k])
-    for k in model.M_out:
-        expr = sum(Xx_out[k, i] * model.Q_tilde[i, j] * Xx_out[k, j] for i, j in model.NN)
-        model.constr.add(expr >= 1 - model.xi_out[k])
-    for i in model.N:
-        for j in model.N:
-            model.constr.add(model.F[i, j] == 0 if i != j else model.F[i, i] == model.F[j, j])
-    model.constr.add(model.Q_tilde >> 0)
+    with Model("model") as M:
+        c1 = M.parameter()
+        c1.setValue(C1)
+        c2 = M.parameter()
+        c2.setValue(C2)
 
-    # Objective function and optimization problem
-    f_obj = model.Q_tilde[1, 1] - C1 * sum(model.xi_in[i] for i in model.M_in) - C2 * sum(model.xi_out[i] for i in model.M_out)
-    model.obj = pyo.Objective(f_obj, sense=pyo.maximize)
+        # Definition of variables
+        Q_tilde = M.variable(Domain.inPSDCone(n+1))
+        F = Q_tilde.slice([1,1],[n+1,n+1])
+        xi_in = M.variable(m_in, Domain.greaterThan(0.0))
+        xi_out = M.variable(m_out, Domain.greaterThan(0.0))
 
-    opt = pyo.SolverFactory('MOSEK')
-    # opt = pyo.SolverFactory('ipopt')
-    res_obj = opt.solve(model, tee=True)
-    model.pprint()
+        # Objective function and optimization problem
+        f_obj = Expr.sub(Q_tilde.index([0,0]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
+        M.objective(ObjectiveSense.Maximize, f_obj)
 
-    # Solutions
-    Q_tilde_star = model.Q_tilde.value
-    F_star = model.F.value
-    t_star = Q_tilde_star[1, 2:]
-    s_star = Q_tilde_star[1, 1]
-    c_star = []  # optimal center of the sphere
-    for i in model.N:
-        c_star[i] = - (1/F_star[i,i])*t_star[i]
-    delta_star = s_star - sum(c_star[i]*F_star[i,j]*c_star[j] for i,j in model.N)
-    Q_star = (F_star[i,j] / (1 - delta_star) for i,j in model.N)
-    r_star = np.sqrt(1 / Q_star[1,1])
-    xi_in_star = model.xi_in.value
-    xi_out_star = model.xi_out.value
+        # Definition of constraints
+        for i in range(m_in):
+            xxt = Xx_in[i].reshape((n+1,1)) @ Xx_in[i].reshape((1,n+1))
+            expr = Expr.dot(xxt,Q_tilde)
+            M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
+        for i in range(m_out):
+            xxt = Xx_out[i].reshape((n+1,1)) @ Xx_out[i].reshape((1,n+1))
+            expr = Expr.dot(xxt, Q_tilde)
+            M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
+        for i in range(n):
+            for j in range(n):
+                if i!=j:
+                    M.constraint(F.index([i,j]), Domain.equalsTo(0.0))
+                else:
+                    M.constraint(Expr.sub(F.index([i,i]), F.index([j,j])), Domain.equalsTo(0.0))
 
-    X_in = np.delete(Xx_in,0,1)
-    X_out = np.delete(Xx_out, 0, 1)
+        M.setLogHandler(sys.stdout)
+        M.solve()
+
+        # Solutions
+        Q_tilde_star = np.reshape(Q_tilde.level(),(n+1,n+1))
+        F_star = Q_tilde_star[1:,1:]
+        t_star = Q_tilde_star[0,1:]
+        s_star = Q_tilde_star[0,0]
+        c_star = - np.linalg.inv(F_star) @ t_star
+        delta_star = s_star - c_star @ F_star @ c_star.T
+        Q_star = F_star / (1 - delta_star)
+        r_star = np.sqrt(1 / Q_star[0,0])
+        xi_in_star = xi_in.level()
+        xi_out_star = xi_out.level()
+
+        X_in = np.delete(Xx_in, 0, 1)
+        X_out = np.delete(Xx_out, 0, 1)
 
     return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
@@ -304,8 +293,8 @@ def class_in_selection(X, y, epsilon):
 
     return in_class, out_class, in_label, out_label
 
-# Function 2 for selection of class in the sphere
-def class_in_selection2(X, y, epsilon, minpts):
+# My function for selection of class in the sphere
+def my_class_in_selection(X, y, epsilon, minpts):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -360,12 +349,12 @@ def class_in_selection2(X, y, epsilon, minpts):
 
     return in_class, out_class, in_label, out_label
 
-def new2_spherical_class_fit_semidef(X, y, epsilon, minpts, C1, C2):
+def my_spherical_class_fit_semidef(X, y, epsilon, minpts, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
     #Selection of class in
-    X_in, X_out, in_label, out_label = class_in_selection2(X, y, epsilon, minpts)
+    X_in, X_out, in_label, out_label = my_class_in_selection(X, y, epsilon, minpts)
 
     # Definition of variables
     Q = cp.Variable((n,n),symmetric=True)
@@ -400,7 +389,7 @@ def new2_spherical_class_fit_semidef(X, y, epsilon, minpts, C1, C2):
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def new2_spherical_class_fit_semidef2(X, y, epsilon, minpts, C1, C2):
+def my_spherical_class_fit_semidef2(X, y, epsilon, minpts, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -408,7 +397,7 @@ def new2_spherical_class_fit_semidef2(X, y, epsilon, minpts, C1, C2):
     Xx = np.hstack((np.ones((m, 1)), X))  # (m,n+1)
 
     # Selection of class in
-    Xx_in, Xx_out, in_label, out_label = class_in_selection2(Xx, y, epsilon, minpts)
+    Xx_in, Xx_out, in_label, out_label = my_class_in_selection(Xx, y, epsilon, minpts)
 
     # Definition of variables
     Q_tilde = cp.Variable((n + 1, n + 1), symmetric=True)
