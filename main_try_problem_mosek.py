@@ -12,11 +12,14 @@ from sklearn.metrics import classification_report, accuracy_score
 from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 
+f = open('example_'+str(300)+'_'+str(2)+'.txt', 'w')
+f.write('example with n_samples='+str(300)+'and n_features='+str(2)+'\n')
 
 n_features = 2
 
 # Creation of a casual dataset with 2 clusters
-X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.85)
+#X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.85) #fissa random seed alla fine di tutto
+X, y = make_classification(300,2,n_classes=2,n_clusters_per_class=1,class_sep=1.3,n_informative=2,n_redundant=0,n_repeated=0)
 
 m = X.shape[0]
 n = X.shape[1]
@@ -51,9 +54,10 @@ d_max = max(distances.values())
 # Hyperparameters
 epsilon = np.mean([d_min,d_max])
 minpts = 3
-C1 = 2e0
-C2 = 2e0
+C1 = 1e-1
+C2 = 1e-1
 
 # Optimization Problem
 r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label = spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2)
+
 print('class in = '+str(in_label), 'class out = '+str(out_label), 'optimal center = '+str(c_star), 'optimal radius = '+str(r_star))

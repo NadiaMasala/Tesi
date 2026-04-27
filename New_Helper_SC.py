@@ -192,7 +192,7 @@ def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
         xi_out = M.variable(m_out, Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.sub(Q_tilde.index([0,0]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
+        f_obj = Expr.sub(Q_tilde.index([1,1]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
         # Definition of constraints
