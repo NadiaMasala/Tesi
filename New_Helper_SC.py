@@ -231,6 +231,71 @@ def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
 
     return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
+def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
+    m = X.shape[0]
+    n = X.shape[1]
+
+    # New points in R^(n+1)
+    Xx = np.hstack((np.ones((m, 1)), X))
+
+    # Selection of class in
+    Xx_in, Xx_out, in_label, out_label = my_class_in_selection(Xx, y, epsilon, minpts)
+    m_in = Xx_in.shape[0]
+    m_out = Xx_out.shape[0]
+
+
+    with Model("model") as M:
+        c1 = M.parameter()
+        c1.setValue(C1)
+        c2 = M.parameter()
+        c2.setValue(C2)
+
+        # Definition of variables
+        Q_tilde = M.variable(Domain.inPSDCone(n+1))
+        F = Q_tilde.slice([1,1],[n+1,n+1])
+        xi_in = M.variable(m_in, Domain.greaterThan(0.0))
+        xi_out = M.variable(m_out, Domain.greaterThan(0.0))
+
+        # Objective function and optimization problem
+        f_obj = Expr.add(Q_tilde.index([1,1]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
+        M.objective(ObjectiveSense.Minimize, f_obj)
+
+        # Definition of constraints
+        for i in range(m_in):
+            xxt = Xx_in[i].reshape((n+1,1)) @ Xx_in[i].reshape((1,n+1))
+            expr = Expr.dot(xxt,Q_tilde)
+            M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
+        for i in range(m_out):
+            xxt = Xx_out[i].reshape((n+1,1)) @ Xx_out[i].reshape((1,n+1))
+            expr = Expr.dot(xxt, Q_tilde)
+            M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
+        for i in range(n):
+            for j in range(n):
+                if i!=j:
+                    M.constraint(F.index([i,j]), Domain.equalsTo(0.0))
+                else:
+                    M.constraint(Expr.sub(F.index([i,i]), F.index([j,j])), Domain.equalsTo(0.0))
+
+        M.setLogHandler(sys.stdout)
+        M.solve()
+
+        # Solutions
+        Q_tilde_star = np.reshape(Q_tilde.level(),(n+1,n+1))
+        F_star = Q_tilde_star[1:,1:]
+        t_star = Q_tilde_star[0,1:]
+        s_star = Q_tilde_star[0,0]
+        c_star = - np.linalg.inv(F_star) @ t_star
+        delta_star = s_star - c_star @ F_star @ c_star.T
+        Q_star = F_star / (1 - delta_star)
+        r_star = np.sqrt(1 / Q_star[0,0])
+        xi_in_star = xi_in.level()
+        xi_out_star = xi_out.level()
+
+        X_in = np.delete(Xx_in, 0, 1)
+        X_out = np.delete(Xx_out, 0, 1)
+
+    return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
+
 # Predict with free center
 def new_spherical_class_pred2(X_test, r, c, in_label, out_label):
     m = X_test.shape[0]
