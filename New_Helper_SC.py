@@ -143,7 +143,7 @@ def new_spherical_class_fit_semidef2(X, y, epsilon, C1, C2):
     constr += [Q_tilde >> 0]  # Q_tilde is semi-definite positive
 
     # Objective function and optimization problem
-    obj = Q_tilde[0, 0] - C1 * cp.sum(xi_in) - C2 * cp.sum(xi_out)
+    obj = Q_tilde[1, 1] - C1 * cp.sum(xi_in) - C2 * cp.sum(xi_out)
     objective = cp.Maximize(obj)
 
     prob = cp.Problem(objective, constr)
@@ -253,11 +253,18 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         # Definition of variables
         Q_tilde = M.variable(Domain.inPSDCone(n+1))
         F = Q_tilde.slice([1,1],[n+1,n+1])
+        T = M.variable(Domain.unbounded(n))
+        Id = Matrix.eye(n)
+        B = M.variable(Domain.inPSDCone(2*n))
+        B11 = B.slice([0,0],[n,n])
+        B12 = B.slice([0,n],[n,2*n])
+        B21 = B.slice([n,0],[n,2*n])
+        B22 = B.slice([n,n],[2*n,2*n])
         xi_in = M.variable(m_in, Domain.greaterThan(0.0))
         xi_out = M.variable(m_out, Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.add(Q_tilde.index([1,1]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
+        f_obj = Expr.add(Expr.dot(T,Id), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Minimize, f_obj)
 
         # Definition of constraints
@@ -275,6 +282,11 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
                     M.constraint(F.index([i,j]), Domain.equalsTo(0.0))
                 else:
                     M.constraint(Expr.sub(F.index([i,i]), F.index([j,j])), Domain.equalsTo(0.0))
+        M.constraint(Expr.sub(T, T.transpose()), Domain.equalsTo(0.0))
+        M.constraint(Expr.sub(B11, F), Domain.equalsTo(0.0))
+        M.constraint(Expr.sub(B12, Id), Domain.equalsTo(0.0))
+        M.constraint(Expr.sub(B21, Id), Domain.equalsTo(0.0))
+        M.constraint(Expr.sub(B22, T), Domain.equalsTo(0.0))
 
         M.setLogHandler(sys.stdout)
         M.solve()
@@ -484,7 +496,7 @@ def my_spherical_class_fit_semidef2(X, y, epsilon, minpts, C1, C2):
     constr += [Q_tilde >> 0]  # Q_tilde is semi-definite positive
 
     # Objective function and optimization problem
-    obj = Q_tilde[0, 0] - C1 * cp.sum(xi_in) - C2 * cp.sum(xi_out)
+    obj = Q_tilde[1, 1] - C1 * cp.sum(xi_in) - C2 * cp.sum(xi_out)
     objective = cp.Maximize(obj)
 
     prob = cp.Problem(objective, constr)
