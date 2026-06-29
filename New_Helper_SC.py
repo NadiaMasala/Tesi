@@ -53,7 +53,7 @@ def spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
     n = X.shape[1]
 
     #Selection of class in
-    X_in, X_out, in_label, out_label = class_in_selection(X, y, epsilon)
+    X_in, X_out, in_label, out_label = my_class_in_selection(X, y, epsilon)
     m_in = X_in.shape[0]
     m_out = X_out.shape[0]
 
@@ -72,13 +72,13 @@ def spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
         f_obj = Expr.sub(Q.index([0, 0]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
-        # Definition of constraints
+        # Constraints
         for i in range(m_in):
-            xxt = X_in[i].reshape((1,n)) @ X_in[i].reshape((n,1))
+            xxt = X_in[i].reshape((n,1)) @ X_in[i].reshape((1,n))
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
-            xxt = X_out[i].reshape((n,1)) @ X_out[i].reshape((1,n))
+            xxt = X_out[i].reshape((1,n)) @ X_out[i].reshape((n,1))
             expr = Expr.dot(xxt, Q)
             M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
@@ -192,10 +192,10 @@ def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
         xi_out = M.variable(m_out, Domain.greaterThan(0.0))
 
         # Objective function and optimization problem
-        f_obj = Expr.sub(Q_tilde.index([1,1]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
+        f_obj = Expr.sub(F.index([0,0]), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Maximize, f_obj)
 
-        # Definition of constraints
+        # Constraints
         for i in range(m_in):
             xxt = Xx_in[i].reshape((n+1,1)) @ Xx_in[i].reshape((1,n+1))
             expr = Expr.dot(xxt,Q_tilde)
@@ -217,10 +217,10 @@ def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
         # Solutions
         Q_tilde_star = np.reshape(Q_tilde.level(),(n+1,n+1))
         F_star = Q_tilde_star[1:,1:]
-        t_star = Q_tilde_star[0,1:]
+        t_star = Q_tilde_star[1:,0].reshape((n,1))
         s_star = Q_tilde_star[0,0]
         c_star = - np.linalg.inv(F_star) @ t_star
-        delta_star = s_star - c_star @ F_star @ c_star.T
+        delta_star = s_star - c_star.T @ F_star @ c_star
         Q_star = F_star / (1 - delta_star)
         r_star = np.sqrt(1 / Q_star[0,0])
         xi_in_star = xi_in.level()
@@ -258,7 +258,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         B = M.variable(Domain.inPSDCone(2*n))
         B11 = B.slice([0,0],[n,n])
         B12 = B.slice([0,n],[n,2*n])
-        B21 = B.slice([n,0],[n,2*n])
+        B21 = B.slice([n,0],[2*n,n])
         B22 = B.slice([n,n],[2*n,2*n])
         xi_in = M.variable(m_in, Domain.greaterThan(0.0))
         xi_out = M.variable(m_out, Domain.greaterThan(0.0))
@@ -267,7 +267,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         f_obj = Expr.add(Expr.dot(T,Id), Expr.add(Expr.mul(c1, Expr.sum(xi_in)), Expr.mul(c2, Expr.sum(xi_out))))
         M.objective(ObjectiveSense.Minimize, f_obj)
 
-        # Definition of constraints
+        # Constraints
         for i in range(m_in):
             xxt = Xx_in[i].reshape((n+1,1)) @ Xx_in[i].reshape((1,n+1))
             expr = Expr.dot(xxt,Q_tilde)
@@ -293,11 +293,12 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
 
         # Solutions
         Q_tilde_star = np.reshape(Q_tilde.level(),(n+1,n+1))
+        T_star = np.reshape(T.level(),(n,n))
         F_star = Q_tilde_star[1:,1:]
-        t_star = Q_tilde_star[0,1:]
+        t_star = Q_tilde_star[1:,0].reshape((n,1))
         s_star = Q_tilde_star[0,0]
         c_star = - np.linalg.inv(F_star) @ t_star
-        delta_star = s_star - c_star @ F_star @ c_star.T
+        delta_star = s_star - c_star.T @ F_star @ c_star
         Q_star = F_star / (1 - delta_star)
         r_star = np.sqrt(1 / Q_star[0,0])
         xi_in_star = xi_in.level()
@@ -321,7 +322,7 @@ def new_spherical_class_pred2(X_test, r, c, in_label, out_label):
 
     return np.array(y_pred)
 
-# Function for selection of class in the sphere
+# Function for selection of class inside the sphere
 def class_in_selection(X, y, epsilon):
     m = X.shape[0]
     n = X.shape[1]
@@ -347,8 +348,8 @@ def class_in_selection(X, y, epsilon):
     for i in range(m):
         distances[i] = np.linalg.norm(barycenter - X[i])
 
-    A_in = []  # points of A in the sphere of radius = epsilon
-    B_in = []  # points of B in the sphere of radius = epsilon
+    A_in = []  # points of A inside the sphere of radius = epsilon
+    B_in = []  # points of B inside the sphere of radius = epsilon
     for i in range(m):
         if distances[i] <= epsilon:
             if y[i] == labels[0]:
@@ -356,7 +357,7 @@ def class_in_selection(X, y, epsilon):
             elif y[i] == labels[1]:
                 B_in.append(X[i])
 
-    # Selection of the class that has to be in the separation sphere
+    # Selection of the class that has to be inside the separation sphere
     if len(A_in) >= len(B_in):
         in_class = A
         out_class = B
@@ -370,7 +371,7 @@ def class_in_selection(X, y, epsilon):
 
     return in_class, out_class, in_label, out_label
 
-# My function for selection of class in the sphere
+# My function for selection of class inside the sphere
 def my_class_in_selection(X, y, epsilon, minpts):
     m = X.shape[0]
     n = X.shape[1]
@@ -401,16 +402,16 @@ def my_class_in_selection(X, y, epsilon, minpts):
     for j in range(B.shape[0]):
         distancesB[j] = np.linalg.norm(C_b - B[j])
 
-    A_in = []  # points of A in the sphere of radius = epsilon
+    A_in = []  # points of A inside the sphere of radius = epsilon
     for i in range(A.shape[0]):
         if distancesA[i] <= epsilon:
                 A_in.append(A[i])
-    B_in = []  # points of B in the sphere of radius = epsilon
+    B_in = []  # points of B inside the sphere of radius = epsilon
     for j in range(B.shape[0]):
         if distancesB[j] <= epsilon:
                 B_in.append(B[j])
 
-    # Selection of the class that has to be in the separation sphere
+    # Selection of the class that has to be inside the separation sphere
     if len(A_in) >= minpts or len(B_in) >= minpts:
         if len(A_in) >= len(B_in):
             in_class = A
