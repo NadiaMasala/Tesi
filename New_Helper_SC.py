@@ -48,12 +48,12 @@ def new_spherical_class_fit_semidef(X, y, epsilon, C1, C2):
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
+def spherical_class_fit_semidef_mosek(X, y, epsilon, minpts, C1, C2):
     m = X.shape[0]
     n = X.shape[1]
 
     #Selection of class in
-    X_in, X_out, in_label, out_label = my_class_in_selection(X, y, epsilon)
+    X_in, X_out, in_label, out_label = my_class_in_selection(X, y, epsilon, minpts)
     m_in = X_in.shape[0]
     m_out = X_out.shape[0]
 
@@ -78,7 +78,7 @@ def spherical_class_fit_semidef_mosek(X, y, epsilon, C1, C2):
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
-            xxt = X_out[i].reshape((1,n)) @ X_out[i].reshape((n,1))
+            xxt = X_out[i].T @ X_out[i]
             expr = Expr.dot(xxt, Q)
             M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
