@@ -253,7 +253,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         # Definition of variables
         Q_tilde = M.variable(Domain.inPSDCone(n+1))
         F = Q_tilde.slice([1,1],[n+1,n+1])
-        T = M.variable(Domain.unbounded(n))
+        T = M.variable([n,n])
         Id = Matrix.eye(n)
         B = M.variable(Domain.inPSDCone(2*n))
         B11 = B.slice([0,0],[n,n])
@@ -307,7 +307,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         X_in = np.delete(Xx_in, 0, 1)
         X_out = np.delete(Xx_out, 0, 1)
 
-    return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
+    return r_star, c_star.ravel(), xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
 # Predict with free center
 def new_spherical_class_pred2(X_test, r, c, in_label, out_label):

@@ -13,19 +13,18 @@ from sklearn.metrics import classification_report, accuracy_score
 from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 
-#n_samples = [100, 200, 300]
-n_samples = [300]
-#n_features = [2, 10, 40]
-n_features = [40]
+n_samples = [100, 200]
+n_features = [2, 10, 40]
 
 for ns in n_samples:
     for nf in n_features:
 
-        with open('dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
-            f.write('Dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n')
+        with open('mb_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+            f.write('Synthetic dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n(make_blobs)\n')
 
             # Creation of a casual dataset with 2 clusters
-            X, y = make_classification(ns, nf, n_classes=2, n_clusters_per_class=1, class_sep=1.3, n_informative=2,n_redundant=0, n_repeated=0)
+            #X, y = make_classification(ns, nf, n_classes=2, n_clusters_per_class=1, class_sep=1.3, n_informative=2,n_redundant=0, n_repeated=0)
+            X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=0.6)
 
             m = X.shape[0]
             n = X.shape[1]
@@ -46,23 +45,43 @@ for ns in n_samples:
             # Splitting the dataset in training set e test set
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-            # Definition of the barycenter of training points
-            barycenter = np.zeros(X_train.shape[1])
-            for j in range(X_train.shape[1]):
-                barycenter[j] = np.mean(X_train[:, j])
-
-            distances = {}
+            # Splitting training classes by their labels
+            A_train = []
+            B_train = []
             for i in range(X_train.shape[0]):
-                distances[i] = np.linalg.norm(barycenter - X_train[i])
+                if y[i] == labels[0]:
+                    A_train.append(X_train[i])
+                elif y[i] == labels[1]:
+                    B_train.append(X_train[i])
+            A_train = np.array(A_train)
+            B_train = np.array(B_train)
 
-            d_min = min(distances.values())
-            d_max = max(distances.values())
+            # Defining training classes centroids
+            cA_train = np.zeros(A_train.shape[1])
+            cB_train = np.zeros(B_train.shape[1])
+            for j in range(X_train.shape[1]):
+                cA_train[j] = np.mean(A_train[:, j])
+                cB_train[j] = np.mean(B_train[:, j])
+
+            dA_train = {}
+            for i in range(A_train.shape[0]):
+                dA_train[i] = np.linalg.norm(cA_train - A_train[i])
+            dB_train = {}
+            for j in range(B_train.shape[0]):
+                dB_train[j] = np.linalg.norm(cB_train - B_train[j])
+
+            dA_min = min(dA_train.values())
+            dA_max = max(dA_train.values())
+            dB_min = min(dB_train.values())
+            dB_max = max(dB_train.values())
+            d_min = max(dA_min, dB_min)
+            d_max = min(dA_max, dB_max)
 
             # Selection of values of hyperparameters by Grid Search
             epsilon_par = list(np.linspace(d_min,d_max,5))
-            minpts_par = [3, 5, 10, 15, 20]
-            C1_par = list(np.linspace(1e-1, 1e+4, 5))
-            C2_par = list(np.linspace(1e-1, 1e+4, 5))
+            minpts_par = [5, 10, 15]
+            C1_par = list(np.linspace(1e-1, 1e+4, 4))
+            C2_par = list(np.linspace(1e-1, 1e+4, 4))
             center_par = ['fixed','free']
             selected_parameters = {'epsilon':epsilon_par, 'minpts':minpts_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
             sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
