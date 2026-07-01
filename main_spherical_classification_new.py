@@ -114,4 +114,4 @@ for ns in n_samples:
                 axes.set_xlim(min(all_x0) - 1, max(all_x0) + 1)
                 axes.set_ylim(min(all_x1) - 1, max(all_x1) + 1)
                 plt.title("Spherical Classification - n_samples = "+str(ns)+", n_features = "+str(nf))
-                plt.show()
+                plt.savefig('experiments/fig_'+str(ns)+'_'+str(nf)+'.pdf')
