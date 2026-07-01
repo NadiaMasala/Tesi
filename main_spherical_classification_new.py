@@ -14,19 +14,17 @@ from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 
 n_samples = [100, 200]
-#n_samples = [100]
 n_features = [2, 10, 40]
-#n_features = [40]
 
 for ns in n_samples:
     for nf in n_features:
 
-        with open('mb_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+        with open('experiments/mb_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
             f.write('Synthetic dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n(make_blobs)\n')
 
             # Creation of a casual dataset with 2 clusters
             #X, y = make_classification(ns, nf, n_classes=2, n_clusters_per_class=1, class_sep=1.3, n_informative=2,n_redundant=0, n_repeated=0)
-            X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=0.6)
+            X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=1.4)
 
             m = X.shape[0]
             n = X.shape[1]

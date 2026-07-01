@@ -15,7 +15,7 @@ from New_Helper_SC import *
 n_features = 2
 
 # Creation of a casual dataset with 2 clusters
-X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=0.6)
+X, y = make_blobs(n_samples=100, centers=2, n_features=n_features, cluster_std=1.4)
 m = X.shape[0]
 n = X.shape[1]
 
