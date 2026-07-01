@@ -1,0 +1,27 @@
+Synthetic dataset with n_samples=100 and n_features=10
+(make_blobs)
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(9.127176074072315), 'minpts': 5}
+Class in = 0
+Optimal center = [-3.05847554 -1.59270791 -2.75312764  1.74589609 -5.41791485 -7.85470672
+ -7.39771936  6.47526961 -5.53853727  4.81763509]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+           0       1.00      0.71      0.83        42
+           1       0.76      1.00      0.86        38
+
+    accuracy                           0.85        80
+   macro avg       0.88      0.86      0.85        80
+weighted avg       0.89      0.85      0.85        80
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+           0       1.00      0.25      0.40         8
+           1       0.67      1.00      0.80        12
+
+    accuracy                           0.70        20
+   macro avg       0.83      0.62      0.60        20
+weighted avg       0.80      0.70      0.64        20
+
+100&10&0.85&0.864&0.7&0.8&0.82&0.847\\
