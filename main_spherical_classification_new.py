@@ -12,9 +12,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report, accuracy_score
 from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
+from sklearn.metrics import accuracy_score, f1_score
 
 n_samples = [100, 200]
 n_features = [2, 10, 40]
+
 
 for ns in n_samples:
     for nf in n_features:
@@ -84,7 +86,7 @@ for ns in n_samples:
             C2_par = list(np.linspace(1e-1, 1e+4, 4))
             center_par = ['fixed','free']
             selected_parameters = {'epsilon':epsilon_par, 'minpts':minpts_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
-            sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
+            sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 30)
             sc_grid.fit(X_train, y_train)
             best_params = sc_grid.best_params_
             f.write('Best hyperparameters = '+ str(best_params) + '\n')
@@ -100,6 +102,15 @@ for ns in n_samples:
             y_pred = sc.predict(X_test)
             f.write('Classification report - Test set \n')
             f.write(classification_report(y_test, y_pred) + '\n')
+            acc_train = accuracy_score(y_train, sc.predict(X_train))
+            acc_test = accuracy_score(y_test, sc.predict(X_test))
+            acc_tot = accuracy_score(y, sc.predict(X))
+            f1_train = f1_score(y_train, sc.predict(X_train))
+            f1_test = f1_score(y_test, sc.predict(X_test))
+            f1_tot = f1_score(y, sc.predict(X))
+            f.write(str(ns)+ '&' +str(nf)+ '&' +str(round(acc_train,3))+ '&' +str(round(f1_train,3))+ '&' +str(round(acc_test,3))+ '&' +str(round(f1_test,3))+ '&' +str(round(acc_tot,3))+ '&' +str(round(f1_tot,3))+ '\\\\')
+
+
 
             # Graphics
             if n == 2:

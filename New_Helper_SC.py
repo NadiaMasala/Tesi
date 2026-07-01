@@ -89,6 +89,7 @@ def spherical_class_fit_semidef_mosek(X, y, epsilon, minpts, C1, C2):
                     M.constraint(Expr.sub(Q.index([i,i]), Q.index([j,j])), Domain.equalsTo(0.0))
 
         M.setLogHandler(sys.stdout)
+        M.setSolverParam('log', 0)
         M.solve()
 
         # Solutions
@@ -289,6 +290,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         M.constraint(Expr.sub(B22, T), Domain.equalsTo(0.0))
 
         M.setLogHandler(sys.stdout)
+        M.setSolverParam('log',0)
         M.solve()
 
         # Solutions
