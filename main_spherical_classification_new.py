@@ -18,15 +18,18 @@ n_samples = [100, 200]
 n_features = [2, 10, 40]
 
 
+
 for ns in n_samples:
     for nf in n_features:
 
-        with open('experiments/mb_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
-            f.write('Synthetic dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n(make_blobs)\n')
+        #with open('experiments/mb_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+        with open('experiments/mc_dataset_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+            #f.write('Synthetic dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n(make_blobs)\n')
+            f.write('Synthetic dataset with n_samples='+str(ns)+' and n_features='+str(nf)+'\n(make_classification)\n')
 
             # Creation of a casual dataset with 2 clusters
-            #X, y = make_classification(ns, nf, n_classes=2, n_clusters_per_class=1, class_sep=1.3, n_informative=2,n_redundant=0, n_repeated=0)
-            X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=1.4)
+            X, y = make_classification(ns, nf, n_classes=2, n_clusters_per_class=1, class_sep=1.3, n_informative=nf,n_redundant=0, n_repeated=0)
+            #X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=1.4)
 
             m = X.shape[0]
             n = X.shape[1]
@@ -125,4 +128,5 @@ for ns in n_samples:
                 axes.set_xlim(min(all_x0) - 1, max(all_x0) + 1)
                 axes.set_ylim(min(all_x1) - 1, max(all_x1) + 1)
                 plt.title("Spherical Classification - n_samples = "+str(ns)+", n_features = "+str(nf))
-                plt.savefig('experiments/fig_'+str(ns)+'_'+str(nf)+'.pdf')
+                #plt.savefig('experiments/fig_'+str(ns)+'_'+str(nf)+'.pdf')
+                plt.savefig('experiments/fig_mc_'+str(ns)+'_'+str(nf)+'.pdf')
