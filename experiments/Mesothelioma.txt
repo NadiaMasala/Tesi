@@ -1,0 +1,30 @@
+Dataset "Mesothelioma":  n_samples = 324, n_features = 34
+Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(3.2599427762284057), 'minpts': 5}
+Class in = 1.0
+Optimal center = [ 0.12487725  0.21978852 -0.34889862  0.65933693 -0.97252588 -0.1745698
+  1.00000449 -0.27472855 -0.43957668 -0.82865686  0.67033328  0.4285794
+  0.25273321 -0.36263956  0.01100245 -0.13431159 -0.37790302 -0.208798
+ -0.83069582  0.05251108 -0.5102494  -0.87946357  0.28695617 -0.33831901
+ -0.71139313 -0.87852325  0.22161482 -0.01883523 -0.36927016  0.90109549
+  0.7912044   0.18680988  0.02196839  0.13496597]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.30      1.00      0.46        77
+         1.0       0.00      0.00      0.00       182
+
+    accuracy                           0.30       259
+   macro avg       0.15      0.50      0.23       259
+weighted avg       0.09      0.30      0.14       259
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.29      1.00      0.45        19
+         1.0       0.00      0.00      0.00        46
+
+    accuracy                           0.29        65
+   macro avg       0.15      0.50      0.23        65
+weighted avg       0.09      0.29      0.13        65
+
+Mesothelioma & 324 & 34 & 0.297 & 0.0 & 0.292 & 0.0 & 0.296 & 0.0\\

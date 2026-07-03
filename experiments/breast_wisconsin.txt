@@ -1,0 +1,29 @@
+Dataset "breast_wisconsin":  n_samples = 569, n_features = 29
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(3333.3999999999996), 'center': 'free', 'epsilon': np.float64(0.5260355910749378), 'minpts': 5}
+Class in = 1.0
+Optimal center = [-0.21722009 -1.94305033 -0.40736819 -0.17035627  0.14561392  0.05418016
+ -0.18568568 -1.12180779 -0.05607789  0.0598987  -0.86223512 -0.45007611
+ -0.92355156 -0.99770288 -0.95566178 -0.0730077   1.18852471 -1.5159191
+ -0.3970602   1.00254075 -0.82842529 -1.93758902 -0.88564144 -0.8940334
+ -1.04564247 -1.12018695 -1.54838124 -1.26442525 -1.07576878]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.93      0.68      0.78       169
+         1.0       0.84      0.97      0.90       286
+
+    accuracy                           0.86       455
+   macro avg       0.88      0.82      0.84       455
+weighted avg       0.87      0.86      0.86       455
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.94      0.74      0.83        43
+         1.0       0.86      0.97      0.91        71
+
+    accuracy                           0.89       114
+   macro avg       0.90      0.86      0.87       114
+weighted avg       0.89      0.89      0.88       114
+
+breast_wisconsin & 569 & 29 & 0.862 & 0.898 & 0.886 & 0.914 & 0.866 & 0.901\\

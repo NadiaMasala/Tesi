@@ -1,0 +1,27 @@
+Dataset "australian":  n_samples = 690, n_features = 14
+Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(2.0935009118946484), 'minpts': 5}
+Class in = 0.0
+Optimal center = [ 0.24056521 -0.49189797 -0.7148572  -0.32323341 -0.19943629 -0.17528041
+ -0.89689277 -0.40589671 -0.33772967 -0.97238087 -0.07108529 -0.12174249
+ -0.79843618 -0.99544504]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.93      0.57      0.71       296
+         1.0       0.66      0.95      0.78       256
+
+    accuracy                           0.75       552
+   macro avg       0.79      0.76      0.74       552
+weighted avg       0.80      0.75      0.74       552
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.92      0.56      0.70        87
+         1.0       0.55      0.92      0.69        51
+
+    accuracy                           0.70       138
+   macro avg       0.74      0.74      0.70       138
+weighted avg       0.79      0.70      0.70       138
+
+australian & 690 & 14 & 0.746 & 0.776 & 0.696 & 0.691 & 0.736 & 0.761\\

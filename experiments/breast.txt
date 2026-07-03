@@ -1,0 +1,26 @@
+Dataset "breast":  n_samples = 683, n_features = 10
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(0.696440348252597), 'minpts': 5}
+Class in = 0.0
+Optimal center = [-0.50407792 -0.40689294 -0.46948277 -0.48082011 -0.55590864 -0.25538134
+ -0.39368983 -0.5183156  -0.56730959 -0.63193686]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.91      1.00      0.95       365
+         1.0       1.00      0.80      0.89       181
+
+    accuracy                           0.93       546
+   macro avg       0.96      0.90      0.92       546
+weighted avg       0.94      0.93      0.93       546
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.81      1.00      0.90        79
+         1.0       1.00      0.69      0.82        58
+
+    accuracy                           0.87       137
+   macro avg       0.91      0.84      0.86       137
+weighted avg       0.89      0.87      0.86       137
+
+breast & 683 & 10 & 0.934 & 0.89 & 0.869 & 0.816 & 0.921 & 0.873\\

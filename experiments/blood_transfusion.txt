@@ -1,0 +1,25 @@
+Dataset "blood_transfusion":  n_samples = 748, n_features = 4
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(0.6875282362562462), 'minpts': 5}
+Class in = 0.0
+Optimal center = [-0.15049887 -0.14259778 -0.14259778  0.04160711]
+Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.77      0.89      0.82       457
+         1.0       0.26      0.13      0.17       141
+
+    accuracy                           0.71       598
+   macro avg       0.51      0.51      0.50       598
+weighted avg       0.65      0.71      0.67       598
+
+Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.75      0.83      0.79       113
+         1.0       0.21      0.14      0.16        37
+
+    accuracy                           0.66       150
+   macro avg       0.48      0.48      0.48       150
+weighted avg       0.61      0.66      0.63       150
+
+blood_transfusion & 748 & 4 & 0.707 & 0.171 & 0.66 & 0.164 & 0.698 & 0.169\\
