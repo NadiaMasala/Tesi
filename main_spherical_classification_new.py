@@ -17,8 +17,6 @@ from sklearn.metrics import accuracy_score, f1_score
 n_samples = [100, 200]
 n_features = [2, 10, 40]
 
-
-
 for ns in n_samples:
     for nf in n_features:
 
@@ -48,15 +46,15 @@ for ns in n_samples:
             B = np.array(B)
 
             # Splitting the dataset in training set e test set
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
             # Splitting training classes by their labels
             A_train = []
             B_train = []
             for i in range(X_train.shape[0]):
-                if y[i] == labels[0]:
+                if y_train[i] == labels[0]:
                     A_train.append(X_train[i])
-                elif y[i] == labels[1]:
+                elif y_train[i] == labels[1]:
                     B_train.append(X_train[i])
             A_train = np.array(A_train)
             B_train = np.array(B_train)
@@ -99,20 +97,19 @@ for ns in n_samples:
             sc.fit(X_train, y_train)
             f.write('Class in = '+ str(sc.in_label_) + '\n')
             f.write('Optimal center = '+ str(sc.c_) + '\n')
-            y_pred = sc.predict(X_train)
+            y_train_pred = sc.predict(X_train)
             f.write('Classification report - Training set \n')
-            f.write(classification_report(y_train, y_pred) + '\n')
-            y_pred = sc.predict(X_test)
+            f.write(classification_report(y_train, y_train_pred) + '\n')
+            y_test_pred = sc.predict(X_test)
             f.write('Classification report - Test set \n')
-            f.write(classification_report(y_test, y_pred) + '\n')
-            acc_train = accuracy_score(y_train, sc.predict(X_train))
-            acc_test = accuracy_score(y_test, sc.predict(X_test))
+            f.write(classification_report(y_test, y_test_pred) + '\n')
+            acc_train = accuracy_score(y_train, y_train_pred)
+            acc_test = accuracy_score(y_test, y_test_pred)
             acc_tot = accuracy_score(y, sc.predict(X))
-            f1_train = f1_score(y_train, sc.predict(X_train))
-            f1_test = f1_score(y_test, sc.predict(X_test))
+            f1_train = f1_score(y_train, y_train_pred)
+            f1_test = f1_score(y_test, y_test_pred)
             f1_tot = f1_score(y, sc.predict(X))
             f.write(str(ns)+ '&' +str(nf)+ '&' +str(round(acc_train,3))+ '&' +str(round(f1_train,3))+ '&' +str(round(acc_test,3))+ '&' +str(round(f1_test,3))+ '&' +str(round(acc_tot,3))+ '&' +str(round(f1_tot,3))+ '\\\\')
-
 
 
             # Graphics
@@ -128,5 +125,5 @@ for ns in n_samples:
                 axes.set_xlim(min(all_x0) - 1, max(all_x0) + 1)
                 axes.set_ylim(min(all_x1) - 1, max(all_x1) + 1)
                 plt.title("Spherical Classification - n_samples = "+str(ns)+", n_features = "+str(nf))
-                #plt.savefig('experiments/fig_'+str(ns)+'_'+str(nf)+'.pdf')
+                #plt.savefig('experiments/fig_mb_'+str(ns)+'_'+str(nf)+'.pdf')
                 plt.savefig('experiments/fig_mc_'+str(ns)+'_'+str(nf)+'.pdf')

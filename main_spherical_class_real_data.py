@@ -14,15 +14,15 @@ from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 from sklearn.metrics import accuracy_score, f1_score
 
-#data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','HillValley_training','Fertility']
-data_list = ['Fertility']
+data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','Fertility','HillValley_training']
 
 for d in data_list:
     X = np.genfromtxt('datasets/'+d+'_data.csv',delimiter=',')
-    y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',',dtype=int)
+    y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',')
     X = MinMaxScaler((-1,1)).fit_transform(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
     m = X.shape[0]
     n = X.shape[1]
@@ -93,16 +93,17 @@ for d in data_list:
         sc.fit(X_train, y_train)
         f.write('Class in = '+ str(sc.in_label_) + '\n')
         f.write('Optimal center = '+ str(sc.c_) + '\n')
-        y_pred = sc.predict(X_train)
+        y_train_pred = sc.predict(X_train)
         f.write('Classification report - Training set \n')
-        f.write(classification_report(y_train, y_pred) + '\n')
-        y_pred = sc.predict(X_test)
+        f.write(classification_report(y_train, y_train_pred) + '\n')
+        y_test_pred = sc.predict(X_test)
         f.write('Classification report - Test set \n')
-        f.write(classification_report(y_test, y_pred) + '\n')
-        acc_train = accuracy_score(y_train, sc.predict(X_train))
-        acc_test = accuracy_score(y_test, sc.predict(X_test))
+        f.write(classification_report(y_test, y_test_pred) + '\n')
+
+        acc_train = accuracy_score(y_train, y_train_pred)
+        acc_test = accuracy_score(y_test, y_test_pred)
         acc_tot = accuracy_score(y, sc.predict(X))
-        f1_train = f1_score(y_train, sc.predict(X_train))
-        f1_test = f1_score(y_test, sc.predict(X_test))
+        f1_train = f1_score(y_train, y_train_pred)
+        f1_test = f1_score(y_test, y_test_pred)
         f1_tot = f1_score(y, sc.predict(X))
         f.write(d+' & '+str(m)+' & '+str(n)+' & '+str(round(acc_train,3))+' & '+str(round(f1_train,3))+' & '+str(round(acc_test,3))+' & '+str(round(f1_test,3))+' & '+str(round(acc_tot,3))+' & '+str(round(f1_tot,3))+'\\\\')

@@ -78,7 +78,7 @@ def spherical_class_fit_semidef_mosek(X, y, epsilon, minpts, C1, C2):
             expr = Expr.dot(xxt,Q)
             M.constraint(Expr.sub(expr, Expr.add(1.0, xi_in.index(i))), Domain.lessThan(0.0))
         for i in range(m_out):
-            xxt = X_out[i].T @ X_out[i]
+            xxt = X_out[i].reshape((n,1)) @ X_out[i].reshape((1,n))
             expr = Expr.dot(xxt, Q)
             M.constraint(Expr.sub(expr, Expr.sub(1.0, xi_out.index(i))), Domain.greaterThan(0.0))
         for i in range(n):
