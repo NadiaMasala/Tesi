@@ -14,13 +14,15 @@ from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 from sklearn.metrics import accuracy_score, f1_score
 
-data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','HillValley_training','Fertility']
+#data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','HillValley_training','Fertility']
+data_list = ['Fertility']
 
 for d in data_list:
     X = np.genfromtxt('datasets/'+d+'_data.csv',delimiter=',')
-    y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',')
+    y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',',dtype=int)
     X = MinMaxScaler((-1,1)).fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
     m = X.shape[0]
     n = X.shape[1]
@@ -46,9 +48,9 @@ for d in data_list:
         A_train = []
         B_train = []
         for i in range(X_train.shape[0]):
-            if y[i] == labels[0]:
+            if y_train[i] == labels[0]:
                 A_train.append(X_train[i])
-            elif y[i] == labels[1]:
+            elif y_train[i] == labels[1]:
                 B_train.append(X_train[i])
         A_train = np.array(A_train)
         B_train = np.array(B_train)
