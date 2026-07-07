@@ -21,8 +21,7 @@ for d in data_list:
     y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',')
     X = MinMaxScaler((-1,1)).fit_transform(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
     m = X.shape[0]
     n = X.shape[1]

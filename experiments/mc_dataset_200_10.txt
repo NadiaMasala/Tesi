@@ -1,27 +1,27 @@
 Synthetic dataset with n_samples=200 and n_features=10
 (make_classification)
-Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(5.218079066403813), 'minpts': 5}
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(6666.7), 'center': 'free', 'epsilon': np.float64(6.783347778632784), 'minpts': 5}
 Class in = 0
-Optimal center = [ 2.16778277  2.45391112 -1.87328852  1.04072308 -0.98780155 -1.30385875
- -2.68844417 -1.61001997 -0.76198094  0.95870846]
+Optimal center = [-4.34674843  0.03124046  2.00748705  2.24550542  1.09048882  5.50023508
+  6.31728529 -5.236589    0.76659313  3.40861221]
 Classification report - Training set 
               precision    recall  f1-score   support
 
-           0       0.65      1.00      0.79        82
-           1       1.00      0.44      0.61        78
+           0       1.00      0.51      0.67        81
+           1       0.66      1.00      0.80        79
 
-    accuracy                           0.72       160
-   macro avg       0.83      0.72      0.70       160
-weighted avg       0.82      0.72      0.70       160
+    accuracy                           0.75       160
+   macro avg       0.83      0.75      0.74       160
+weighted avg       0.83      0.75      0.73       160
 
 Classification report - Test set 
               precision    recall  f1-score   support
 
-           0       0.68      0.89      0.77        19
-           1       0.87      0.62      0.72        21
+           0       1.00      0.55      0.71        20
+           1       0.69      1.00      0.82        20
 
-    accuracy                           0.75        40
-   macro avg       0.77      0.76      0.75        40
-weighted avg       0.78      0.75      0.75        40
+    accuracy                           0.78        40
+   macro avg       0.84      0.78      0.76        40
+weighted avg       0.84      0.78      0.76        40
 
-200&10&0.725&0.607&0.75&0.722&0.73&0.635\\
+200&10&0.75&0.798&0.775&0.816&0.755&0.802\\

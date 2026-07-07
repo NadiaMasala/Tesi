@@ -1,27 +1,27 @@
 Synthetic dataset with n_samples=200 and n_features=10
 (make_blobs)
-Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(5.781605744874126), 'minpts': 5}
-Class in = 1
-Optimal center = [ 0.8830655   0.33926193 -9.01572626 -4.79626941  9.11772097  5.72837805
- -4.37554298 -1.95754786  7.21084085 -5.54278303]
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(6.947508455573262), 'minpts': 5}
+Class in = 0
+Optimal center = [ 6.48523533 -4.25394887  8.5173837   5.98947831 -3.28510111  3.71495319
+  6.65380941 -7.29122497  2.84096027 -4.33696676]
 Classification report - Training set 
               precision    recall  f1-score   support
 
-           0       0.96      1.00      0.98        76
-           1       1.00      0.96      0.98        84
+           0       1.00      1.00      1.00        80
+           1       1.00      1.00      1.00        80
 
-    accuracy                           0.98       160
-   macro avg       0.98      0.98      0.98       160
-weighted avg       0.98      0.98      0.98       160
+    accuracy                           1.00       160
+   macro avg       1.00      1.00      1.00       160
+weighted avg       1.00      1.00      1.00       160
 
 Classification report - Test set 
               precision    recall  f1-score   support
 
-           0       1.00      1.00      1.00        24
-           1       1.00      1.00      1.00        16
+           0       1.00      0.95      0.97        20
+           1       0.95      1.00      0.98        20
 
-    accuracy                           1.00        40
-   macro avg       1.00      1.00      1.00        40
-weighted avg       1.00      1.00      1.00        40
+    accuracy                           0.97        40
+   macro avg       0.98      0.97      0.97        40
+weighted avg       0.98      0.97      0.97        40
 
-200&10&0.981&0.982&1.0&1.0&0.985&0.985\\
+200&10&1.0&1.0&0.975&0.976&0.995&0.995\\
