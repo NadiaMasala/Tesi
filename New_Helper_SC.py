@@ -254,7 +254,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
         # Definition of variables
         Q_tilde = M.variable(Domain.inPSDCone(n+1))
         F = Q_tilde.slice([1,1],[n+1,n+1])
-        T = M.variable([n,n])
+        T = M.variable(Domain.inPSDCone(n))
         Id = Matrix.eye(n)
         B = M.variable(Domain.inPSDCone(2*n))
         B11 = B.slice([0,0],[n,n])
@@ -283,7 +283,7 @@ def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
                     M.constraint(F.index([i,j]), Domain.equalsTo(0.0))
                 else:
                     M.constraint(Expr.sub(F.index([i,i]), F.index([j,j])), Domain.equalsTo(0.0))
-        M.constraint(Expr.sub(T, T.transpose()), Domain.equalsTo(0.0))
+        #M.constraint(Expr.sub(T, T.transpose()), Domain.equalsTo(0.0))
         M.constraint(Expr.sub(B11, F), Domain.equalsTo(0.0))
         M.constraint(Expr.sub(B12, Id), Domain.equalsTo(0.0))
         M.constraint(Expr.sub(B21, Id), Domain.equalsTo(0.0))
