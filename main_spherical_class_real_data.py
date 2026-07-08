@@ -14,8 +14,8 @@ from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 from sklearn.metrics import accuracy_score, f1_score
 
-#data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','Fertility','HillValley_training']
-data_list = ['HillValley_training']
+data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','Fertility','HillValley_training']
+
 for d in data_list:
     X = np.genfromtxt('datasets/'+d+'_data.csv',delimiter=',')
     y = np.genfromtxt('datasets/'+d+'_label.csv',delimiter=',')
