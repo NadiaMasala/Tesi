@@ -1,27 +1,27 @@
 Dataset "australian":  n_samples = 690, n_features = 14
-Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(2.0935009118946484), 'minpts': 5}
+Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(1.3931529878559428), 'minpts': 5}
 Class in = 0.0
-Optimal center = [ 0.24056521 -0.49189797 -0.7148572  -0.32323341 -0.19943629 -0.17528041
- -0.89689277 -0.40589671 -0.33772967 -0.97238087 -0.07108529 -0.12174249
- -0.79843618 -0.99544504]
+Optimal center = [ 0.22274878 -0.4953341  -0.68556703 -0.31279619 -0.20306234 -0.15995259
+ -0.90697433 -0.42180092 -0.38388622 -0.97297871 -0.02369655 -0.14691945
+ -0.78505688 -0.99683402]
 Classification report - Training set 
               precision    recall  f1-score   support
 
-         0.0       0.93      0.57      0.71       296
-         1.0       0.66      0.95      0.78       256
+         0.0       0.92      0.59      0.72       306
+         1.0       0.65      0.93      0.77       246
 
     accuracy                           0.75       552
-   macro avg       0.79      0.76      0.74       552
+   macro avg       0.78      0.76      0.74       552
 weighted avg       0.80      0.75      0.74       552
 
 Classification report - Test set 
               precision    recall  f1-score   support
 
-         0.0       0.92      0.56      0.70        87
-         1.0       0.55      0.92      0.69        51
+         0.0       0.92      0.57      0.70        77
+         1.0       0.63      0.93      0.75        61
 
-    accuracy                           0.70       138
-   macro avg       0.74      0.74      0.70       138
-weighted avg       0.79      0.70      0.70       138
+    accuracy                           0.73       138
+   macro avg       0.77      0.75      0.73       138
+weighted avg       0.79      0.73      0.73       138
 
-australian & 690 & 14 & 0.746 & 0.776 & 0.696 & 0.691 & 0.736 & 0.761\\
+australian & 690 & 14 & 0.746 & 0.767 & 0.732 & 0.755 & 0.743 & 0.764\\

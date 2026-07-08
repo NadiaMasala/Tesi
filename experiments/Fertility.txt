@@ -1,9 +1,7 @@
 Dataset "Fertility":  n_samples = 100, n_features = 9
-Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(3333.3999999999996), 'center': 'free', 'epsilon': np.float64(2.0430726429634554), 'minpts': 5}
+Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(3333.3999999999996), 'center': 'fixed', 'epsilon': np.float64(2.067953448056048), 'minpts': 5}
 Class in = 0.0
-Optimal center = [-2.87563980e-01 -3.65286875e-01  4.77039991e-04  5.35603555e-03
- -1.27571569e-04  3.58453921e-01  7.20326807e-01 -7.42695851e-02
- -1.88180345e-01]
+Optimal center = [0. 0. 0. 0. 0. 0. 0. 0. 0.]
 Classification report - Training set 
               precision    recall  f1-score   support
 

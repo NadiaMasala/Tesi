@@ -1,27 +1,25 @@
 Dataset "heart":  n_samples = 270, n_features = 13
-Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(3333.3999999999996), 'center': 'free', 'epsilon': np.float64(1.8411229190109153), 'minpts': 5}
+Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(3333.3999999999996), 'center': 'fixed', 'epsilon': np.float64(1.9985856473944115), 'minpts': 5}
 Class in = 0.0
-Optimal center = [-0.04416327 -0.00345379 -0.08949754 -0.31935462 -0.69678436  0.00332445
-  0.00680127  0.29084198 -0.00229245 -0.69692193 -0.50029477 -0.51444101
- -0.04466682]
+Optimal center = [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
 Classification report - Training set 
               precision    recall  f1-score   support
 
-         0.0       0.54      1.00      0.70       117
-         1.0       0.00      0.00      0.00        99
+         0.0       0.56      1.00      0.71       120
+         1.0       0.00      0.00      0.00        96
 
-    accuracy                           0.54       216
-   macro avg       0.27      0.50      0.35       216
-weighted avg       0.29      0.54      0.38       216
+    accuracy                           0.56       216
+   macro avg       0.28      0.50      0.36       216
+weighted avg       0.31      0.56      0.40       216
 
 Classification report - Test set 
               precision    recall  f1-score   support
 
-         0.0       0.61      1.00      0.76        33
-         1.0       0.00      0.00      0.00        21
+         0.0       0.56      1.00      0.71        30
+         1.0       0.00      0.00      0.00        24
 
-    accuracy                           0.61        54
-   macro avg       0.31      0.50      0.38        54
-weighted avg       0.37      0.61      0.46        54
+    accuracy                           0.56        54
+   macro avg       0.28      0.50      0.36        54
+weighted avg       0.31      0.56      0.40        54
 
-heart & 270 & 13 & 0.542 & 0.0 & 0.611 & 0.0 & 0.556 & 0.0\\
+heart & 270 & 13 & 0.556 & 0.0 & 0.556 & 0.0 & 0.556 & 0.0\\
