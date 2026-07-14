@@ -32,19 +32,45 @@ def spherical_clustering_fit(X,l,d):
 
     X_pca_sorted = X_pca_list.sort()
 
+    n_regions, regions, outliers = sliding_window(X_pca_list,l,d)
+
+
+
 
 
 # Sliding Window Algorithm for density regions along the real line
 def sliding_window(x,l,d):
+    n_regions = 0
+    start = 0
+    regions = []
+    outliers = []
+    for i in range(len(x)):
+        if (i - start + 1 == l):
+            window = x[i:i+l]
+            distances = []
+            for j in range(len(window)):
+                for k in range(len(window)):
+                    if k!=j:
+                        distances.append(np.linalg.norm(window[j] - window[k]))
+            d_max = max(distances)
+            if d_max <= d:
+                if len(regions[i-1]) > 0:
+                    # adding the last point of the window in the previous dense region
+                    regions[i-1] = regions[i-1].append(window[-1])
+                    start += 1
+                else:
+                    # defining a new dense region with the points of the window
+                    regions[i] = regions[i].append(window)
+                    start += 1
+                    n_regions += 1
+            elif d_max > d:
+                start = i+l
 
-    for i in range(x.shape[0]):
-        window = x[i:i+l]
-        distances = []
-        for j in range(window.shape[0]):
-            for k in range(window.shape[0]):
-                if k!=j:
-                    distances.append(np.linalg.norm(window[j] - window[k]))
-        d_max = max(distances)
-        if d_max <= d:
+    return n_regions, regions, outliers
+
+
+
+
+
 
 
