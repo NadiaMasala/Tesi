@@ -32,9 +32,7 @@ def spherical_clustering_fit(X,l,d):
 
     X_pca_sorted = X_pca_list.sort()
 
-    n_regions, regions, outliers = sliding_window(X_pca_list,l,d)
-
-
+    n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
 
 
 
@@ -42,31 +40,39 @@ def spherical_clustering_fit(X,l,d):
 def sliding_window(x,l,d):
     n_regions = 0
     start = 0
+    n_iters = 0
     regions = []
     outliers = []
-    for i in range(len(x)):
-        if (i - start + 1 == l):
-            window = x[i:i+l]
-            distances = []
-            for j in range(len(window)):
-                for k in range(len(window)):
-                    if k!=j:
-                        distances.append(np.linalg.norm(window[j] - window[k]))
-            d_max = max(distances)
-            if d_max <= d:
-                if len(regions[i-1]) > 0:
-                    # adding the last point of the window in the previous dense region
-                    regions[i-1] = regions[i-1].append(window[-1])
-                    start += 1
-                else:
-                    # defining a new dense region with the points of the window
-                    regions[i] = regions[i].append(window)
-                    start += 1
-                    n_regions += 1
-            elif d_max > d:
-                start = i+l
+    while start+l-1 <= len(x)-1:
+        window = x[start:start+l-1]
+        distances = []
+        for j in range(len(window)):
+            for k in range(len(window)):
+                if k!=j:
+                    distances.append(np.linalg.norm(window[j] - window[k]))
+        d_max = max(distances)
+        if d_max <= d:
+            if n_iters == 0:
+                regions[n_iters] = regions[n_iters].append(window)
+                n_regions += 1
+                start += 1
+            elif len(regions[n_iters-1]) > 0:  # if the previous region is not empty (is a dense region)
+                # add the last point of the current window in the previous dense region
+                regions[n_iters-1] = regions[n_iters-1].append(window[-1])
+                start += 1  # slide
+            else: # the previous region is empty (is not dense) or does not exist
+                # define a new dense region with the points of the current window
+                regions[n_iters] = regions[n_iters].append(window)
+                n_regions += 1
+                start += 1
+        elif d_max > d:
+            if n_iters > 0:
+                if not len(regions[n_iters-1]) > 0:
+                    outliers.append(start)
+            start = start+l-1
+        n_iters += 1
 
-    return n_regions, regions, outliers
+    return n_regions, regions, outliers, n_iters
 
 
 
