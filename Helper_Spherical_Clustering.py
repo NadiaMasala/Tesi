@@ -45,6 +45,7 @@ def sliding_window(x,l,d):
     regions = []  # list of dense and no dense (empty) regions
     outliers = []  # list of outliers
     while start+l-1 <= len(x)-1:
+        n_iters += 1
         window = x[start:start+l-1]
         distances = []
         for j in range(len(window)):
@@ -64,18 +65,16 @@ def sliding_window(x,l,d):
                 # add the last point of the current window in the last dense region found
                 last = 0
                 for i in range(n_iters):
-                    if len(regions[i])>0:
+                    if len(regions[i]) > 0:
                         last = i
                 regions[last] = regions[last].append(window[-1])
                 start += 1  # slide
-                dense = 1
         elif d_max > d:
             if dense == 0:  # if we are at the first iteration or the previous region is not dense
-                outliers.append(window[0:-2])
+                outliers.extend(window[0:-2])
             elif dense == 1:  # if at the previous iteration we had a dense region
                 dense = 0
             start = start+l-1
-        n_iters += 1
 
     return n_regions, regions, outliers, n_iters
 
