@@ -55,7 +55,8 @@ def sliding_window(x,l,d):
         if d_max <= d:
             if dense == 0:  # if we are at the first iteration or the previous region is not dense
                 # define a new dense region with the points of the current window
-                regions[n_iters] = regions[n_iters].append(window)
+                # regions[n_iters] = regions[n_iters].append(window)
+                regions.append(window)
                 n_regions += 1
                 start += 1  # slide
                 dense = 1
