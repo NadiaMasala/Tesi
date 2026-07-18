@@ -44,10 +44,13 @@ def sliding_window(x,l,d):
     dense = 0  # flag is 1 if the last point is added to a dense region, 0 otherwise
     regions = []  # list of dense and no dense (empty) regions
     outliers = []  # list of outliers
-    while start+l-1 <= len(x)-1:
+    while start+l <= len(x):
         n_iters += 1
-        window = x[start:start+l-1]
-        distances = []
+        window = x[start:start+l]
+
+        print(window)
+
+        distances = []  # list of distances between all couples of points in the current window
         for j in range(len(window)):
             for k in range(len(window)):
                 if k < j:
@@ -56,25 +59,24 @@ def sliding_window(x,l,d):
         if d_max <= d:
             if dense == 0:  # if we are at the first iteration or the previous region is not dense
                 # define a new dense region with the points of the current window
-                # regions[n_iters] = regions[n_iters].append(window)
                 regions.append(window)
                 n_regions += 1
                 start += 1  # slide
                 dense = 1
             elif dense == 1:  # if at the previous iteration the point was added to a dense region
                 # add the last point of the current window in the last dense region found
-                last = 0
-                for i in range(n_iters):
-                    if len(regions[i]) > 0:
-                        last = i
-                regions[last] = regions[last].append(window[-1])
+                regions[-1].append(window[-1])
                 start += 1  # slide
         elif d_max > d:
             if dense == 0:  # if we are at the first iteration or the previous region is not dense
-                outliers.extend(window[0:-2])
+                outliers.extend(window[:-1])
             elif dense == 1:  # if at the previous iteration we had a dense region
                 dense = 0
-            start = start+l-1
+            if start+l-1 > len(x)-l:
+                start += 1
+            else:
+                start = start+l-1
+
 
     return n_regions, regions, outliers, n_iters
 
