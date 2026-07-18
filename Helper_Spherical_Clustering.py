@@ -51,11 +51,23 @@ def sliding_window(x,l,d):
         print(window)
 
         distances = []  # list of distances between all couples of points in the current window
+
         for j in range(len(window)):
             for k in range(len(window)):
                 if k < j:
                     distances.append(np.linalg.norm(window[j] - window[k]))
+
+        # alternatively, but it is too slow
+        # distance between consecutive points of the window
+        #for j in range(len(window)):
+        #    while j+1 <= len(window)-1:
+        #        distances.append(np.linalg.norm(window[j+1] - window[j]))
+
         d_max = max(distances)
+        d_max = round(d_max,5)  # to handle numerical errors due to floating-point representation
+
+        print(d_max)
+
         if d_max <= d:
             if dense == 0:  # if we are at the first iteration or the previous region is not dense
                 # define a new dense region with the points of the current window
@@ -68,11 +80,19 @@ def sliding_window(x,l,d):
                 regions[-1].append(window[-1])
                 start += 1  # slide
         elif d_max > d:
-            if dense == 0:  # if we are at the first iteration or the previous region is not dense
-                outliers.extend(window[:-1])
+            if dense == 0:  # if we are at the first iteration or at the previous iteration we had a non-dense region
+                if start+l-1 == len(x)-1:  # if we are at the last iteration
+                    if window[0] in outliers:
+                        outliers.extend(window[1:])  # all the points of the current window, but the first one, are outliers
+                    else:
+                        outliers.extend(window)  # all the points of the current window are outliers
+                else:
+                    outliers.extend(window[:-1])  # all the points of the current window are outliers except for the last one, we will examine it in the following iteration
             elif dense == 1:  # if at the previous iteration we had a dense region
+                if start+l-1 == len(x)-1:  # if we are at the last iteration
+                    outliers.append(window[-1])  # the last point is an outlier
                 dense = 0
-            if start+l-1 > len(x)-l:
+            if start+l-1 > len(x)-l:  # in order to study all the points
                 start += 1
             else:
                 start = start+l-1
