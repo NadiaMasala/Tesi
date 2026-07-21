@@ -5,68 +5,8 @@ from New_Spherical_Class_class import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-from main_test_sliding_window import double_points_idx
-
-
-def spherical_clustering_fit(X,l,d):
-    m = X.shape[0]
-    n = X.shape[1]
-
-    # scaling for PCA
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-
-    # reduction to dimension 1
-    pca = PCA(n_components = 1,copy=True)
-    X_pca = pca.fit_transform(X)
-
-    # saving of indexes of points in a dictionary
-    X_pca_dict = {}
-    for i in range(m):
-        X_pca_dict[i] = X_pca[i]
-
-    # elimination of (possible) double points in X_pca
-    X_pca_list = []
-    X_pca_list_idx = []
-    X_pca_double_idx = []  # list of indexes of double points
-    for i in range(m):
-        if X_pca[i] not in X_pca_list:
-            X_pca_list.append(X_pca[i])
-            X_pca_list_idx.append(i)
-        else:
-            X_pca_double_idx.append(i)
-
-    X_pca_sorted = X_pca_list.sorted()
-
-    n_regions, regions, outliers, n_iter = sliding_window_alg(X_pca_sorted,l,d)
-
-    # classification of points
-    regions_idx = [[] for _ in range(n_regions)]
-    outliers_idx = []
-    for idx in X_pca_list_idx:
-        xp = X_pca[idx]
-        for r_idx,reg in zip(regions_idx,regions):
-            if xp in reg:
-                r_idx.append(idx)
-        if xp in outliers:
-            outliers_idx.append(idx)
-
-    # classification of (possible) double points
-    if len(double_points_idx) > 0:
-        for idx in X_pca_double_idx:
-            xd = X_pca[idx]
-            for r_idx,reg in zip(regions_idx,regions):
-                if xd in reg:
-                    r_idx.append(idx)
-            if xd in outliers:
-                outliers_idx.append(idx)
-
-
-
-
-
 # Sliding Window Algorithm for density regions along the real line
-def sliding_window_alg(x,l,d):
+def sliding_window(x,l,d):
     n_regions = 0  # number of dense regions
     start = 0  # starting index
     n_iters = 0  # number of iterations
@@ -128,6 +68,65 @@ def sliding_window_alg(x,l,d):
 
 
     return n_regions, regions, outliers, n_iters
+
+def spherical_clustering_fit(X,l,d):
+    m = X.shape[0]
+    n = X.shape[1]
+
+    # scaling for PCA
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    # reduction to dimension 1
+    pca = PCA(n_components = 1,copy=True)
+    X_pca = pca.fit_transform(X)
+
+    # saving of indexes of points in a dictionary
+    #X_pca_dict = {}
+    #for i in range(m):
+    #    X_pca_dict[i] = X_pca[i]
+
+    # elimination of (possible) double points in X_pca
+    X_pca_list = []
+    X_pca_list_idx = []
+    X_pca_double_idx = []  # list of indexes of double points
+    for i in range(m):
+        if X_pca[i] not in X_pca_list:
+            X_pca_list.append(X_pca[i])
+            X_pca_list_idx.append(i)
+        else:
+            X_pca_double_idx.append(i)
+
+    X_pca_sorted = X_pca_list.sorted()
+
+    n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
+
+    # classification of points
+    regions_idx = [[] for _ in range(n_regions)]
+    outliers_idx = []
+    for idx in X_pca_list_idx:
+        xp = X_pca[idx]
+        for r_idx,reg in zip(regions_idx,regions):
+            if xp in reg:
+                r_idx.append(idx)
+        if xp in outliers:
+            outliers_idx.append(idx)
+
+    # classification of (possible) double points
+    if len(X_pca_double_idx) > 0:
+        for idx in X_pca_double_idx:
+            xd = X_pca[idx]
+            for r_idx,reg in zip(regions_idx,regions):
+                if xd in reg:
+                    r_idx.append(idx)
+            if xd in outliers:
+                outliers_idx.append(idx)
+
+    return n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
+
+
+
+
 
 
 

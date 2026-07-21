@@ -6,11 +6,11 @@ from Helper_Spherical_Clustering import *
 #points = [0,0.06,0.12,0.25,0.5,1,1.62,1.75,1.87,1.93,2]  # (d = 0.2)
 #points = [-0.9,-0.7,-0.3,-0.1,0,0.2,0.35,0.4,0.9,1]  # (d = 0.3)
 #points = [-4.8,-4.7,-4.62,-4.55,-1,-0.2,1.5,1.62,1.78,4.9]  # (d = 0.3)
-points = [0,0.06,0.12,0.12,0.25,0.5,0.5,1,1.62,1.75,1.87,1.87,1.93,2]  # (d = 0.2) with double points
-#points = [-4.8,-4.7,-4.62,-4.62,-4.55,-1,-1,-1,-0.2,1.5,1.62,1.62,1.62,1.78,4.9]  # (d = 0.3) with double and triple points
+#points = [0,0.06,0.12,0.12,0.25,0.5,0.5,1,1.62,1.75,1.87,1.87,1.93,2]  # (d = 0.2) with double points
+points = [-4.8,-4.7,-4.62,-4.62,-4.55,-1,-1,-1,-0.2,1.5,1.62,1.62,1.62,1.78,4.9]  # (d = 0.3) with double and triple points
 l = 3
-d = 0.2
-#d = 0.3
+#d = 0.2
+d = 0.3
 
 #points_dict = {}
 #for i in range(len(points)):
@@ -27,7 +27,7 @@ for i in range(len(points)):
     else:
         double_points_idx.append(i)
 
-n_regions, regions, outliers, n_iters = sliding_window_alg(points_list,l,d)
+n_regions, regions, outliers, n_iters = sliding_window(points_list,l,d)
 
 # classification of points
 regions_idx = [[] for _ in range(n_regions)]
