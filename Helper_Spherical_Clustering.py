@@ -9,30 +9,53 @@ def spherical_clustering_fit(X,l,d):
     m = X.shape[0]
     n = X.shape[1]
 
+    # scaling for PCA
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
+    # reduction to dimension 1
     pca = PCA(n_components = 1,copy=True)
     X_pca = pca.fit_transform(X)
 
+    # saving of indexes of points in a dictionary
     X_pca_dict = {}
     for i in range(m):
         X_pca_dict[i] = X_pca[i]
 
-    # elimination of double points in X_pca
+    # elimination of (possible) double points in X_pca
     X_pca_list = []
-    X_pca_double_ind = []
+    X_pca_list_idx = []
+    X_pca_double_idx = []  # list of indexes of double points
     for i in range(m):
-        if X_pca_list == []:
+        if X_pca[i] not in X_pca_list:
             X_pca_list.append(X_pca[i])
-        elif X_pca[i] not in X_pca_list:
-            X_pca_list.append(X_pca[i])
+            X_pca_list_idx.append(i)
         else:
-            X_pca_double_ind.append(i)
+            X_pca_double_idx.append(i)
 
-    X_pca_sorted = X_pca_list.sort()
+    X_pca_sorted = X_pca_list.sorted()
 
     n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
+
+    # classification of points
+    regions_idx = [[] for _ in range(n_regions)]
+    outliers_idx = []
+    for idx in X_pca_list_idx:
+        xp = X_pca_list[idx]
+        for r_idx,reg in zip(regions_idx,regions):
+            if xp in reg:
+                r_idx.append(idx)
+        if xp in outliers:
+            outliers_idx.append(idx)
+
+    # classification of double points
+    for idx in X_pca_double_idx:
+        xd = X_pca_dict[idx]
+        for r_idx,reg in zip(regions_idx,regions):
+            if xd in reg:
+                r_idx.append(idx)
+        if xd in outliers:
+            outliers_idx.append(idx)
 
 
 
