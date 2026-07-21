@@ -5,6 +5,9 @@ from New_Spherical_Class_class import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
+from main_test_sliding_window import double_points_idx
+
+
 def spherical_clustering_fit(X,l,d):
     m = X.shape[0]
     n = X.shape[1]
@@ -35,32 +38,35 @@ def spherical_clustering_fit(X,l,d):
 
     X_pca_sorted = X_pca_list.sorted()
 
-    n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
+    n_regions, regions, outliers, n_iter = sliding_window_alg(X_pca_sorted,l,d)
 
     # classification of points
     regions_idx = [[] for _ in range(n_regions)]
     outliers_idx = []
     for idx in X_pca_list_idx:
-        xp = X_pca_list[idx]
+        xp = X_pca[idx]
         for r_idx,reg in zip(regions_idx,regions):
             if xp in reg:
                 r_idx.append(idx)
         if xp in outliers:
             outliers_idx.append(idx)
 
-    # classification of double points
-    for idx in X_pca_double_idx:
-        xd = X_pca_dict[idx]
-        for r_idx,reg in zip(regions_idx,regions):
-            if xd in reg:
-                r_idx.append(idx)
-        if xd in outliers:
-            outliers_idx.append(idx)
+    # classification of (possible) double points
+    if len(double_points_idx) > 0:
+        for idx in X_pca_double_idx:
+            xd = X_pca[idx]
+            for r_idx,reg in zip(regions_idx,regions):
+                if xd in reg:
+                    r_idx.append(idx)
+            if xd in outliers:
+                outliers_idx.append(idx)
+
+
 
 
 
 # Sliding Window Algorithm for density regions along the real line
-def sliding_window(x,l,d):
+def sliding_window_alg(x,l,d):
     n_regions = 0  # number of dense regions
     start = 0  # starting index
     n_iters = 0  # number of iterations
