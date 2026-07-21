@@ -122,6 +122,8 @@ def spherical_clustering_fit(X,l,d):
             if xd in outliers:
                 outliers_idx.append(idx)
 
+
+
     return n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
 
 
