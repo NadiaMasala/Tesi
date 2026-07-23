@@ -63,7 +63,7 @@ def sliding_window(x,l,d):
     return n_regions, regions, outliers, n_iters
 
 
-def spherical_clustering_fit(X,l,d):
+def spherical_clustering_fit(X,l,d,C1,C2,center):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -80,7 +80,7 @@ def spherical_clustering_fit(X,l,d):
     #for i in range(m):
     #    X_pca_dict[i] = X_pca[i]
 
-    # elimination of (possible) double points in X_pca
+    # elimination of (possible) multiple points in X_pca
     X_pca_list = []
     X_pca_list_idx = []
     X_pca_double_idx = []  # list of indexes of double points
@@ -124,37 +124,28 @@ def spherical_clustering_fit(X,l,d):
     #for j in outliers_idx:
     #    y[j] = labels[0]
 
-    # 1 vs all
+    # Multiclass Spherical Classification - 1vsall
     for l in labels[1:]:
         # creation of artificial binary dataset
+        X_box = []
+        C_l = np.zeros(n)
+        for i in range(m):
+            if y[i] == l:
+                for j in range(n):
+                    C_l[j] = np.mean(X[:, j])
+
         y_temp = np.copy(y)
         for i in range(m):
             if y[i] == l:
-                y_temp[i] = 0
+                y_temp[i] = -1
             else:
-                y_temp[i] = 1
-        # binary spherical classification
+                y_temp[i] = +1
+
+        # Binary Spherical Classification
         if center == 'fixed':
-            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X,y_temp,C1,C2)
-            self.r_ = r
-            self.c_ = np.zeros(self.X_.shape[1])
-            self.xi_in_ = xi_in
-            self.xi_out_ = xi_out
-            self.in_class_ = in_class
-            self.out_class_ = out_class
-            self.in_label_ = in_label
-            self.out_label_ = out_label
-        elif self.center == 'free':
-            #r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_mosek(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
-            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
-            self.r_ = r
-            self.c_ = c
-            self.xi_in_ = xi_in
-            self.xi_out_ = xi_out
-            self.in_class_ = in_class
-            self.out_class_ = out_class
-            self.in_label_ = in_label
-            self.out_label_ = out_label
+            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X_box,y_temp,C1,C2)
+        elif center == 'free':
+            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(X_box,y_temp,C1,C2)
 
 
 

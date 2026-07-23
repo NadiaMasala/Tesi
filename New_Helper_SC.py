@@ -432,7 +432,6 @@ def my_class_in_selection(X, y, epsilon=None, minpts=None):
                 in_label = labels[1]
                 out_label = labels[0]
 
-
     return in_class, out_class, in_label, out_label
 
 def my_spherical_class_fit_semidef(X, y, epsilon, minpts, C1, C2):
