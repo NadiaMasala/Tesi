@@ -63,7 +63,7 @@ def sliding_window(x,l,d):
     return n_regions, regions, outliers, n_iters
 
 
-def spherical_clustering_fit(X,l,d,C1,C2,center):
+def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -124,34 +124,50 @@ def spherical_clustering_fit(X,l,d,C1,C2,center):
     #for j in outliers_idx:
     #    y[j] = labels[0]
 
-    # Multiclass Spherical Classification - 1vsall
+    # Multiclass Spherical Classification - 1-vs-all
+    y_temp = np.copy(y)
+    r_stack = []
+    c_stack = []
     for l in labels[1:]:
         # creation of artificial binary dataset
-        X_box = []
+        X_l = []
         C_l = np.zeros(n)
         for i in range(m):
             if y[i] == l:
-                for j in range(n):
-                    C_l[j] = np.mean(X[:, j])
-
-        y_temp = np.copy(y)
-        for i in range(m):
-            if y[i] == l:
+                X_l.append(X[i])
                 y_temp[i] = -1
             else:
                 y_temp[i] = +1
+        for i in range(X_l.shape[0]):
+            for j in range(n):
+                C_l[j] = np.mean(X_l[:, j])
+        distances_l = {}
+        for i in range(X_l.shape[0]):
+            distances_l[i] = np.linalg.norm(C_l - X_l[i])
+        d_l_max = max(distances_l.value())
+        d_max = d_l_max + eps
+        for i in range(m):
+            if X[i] not in X_l:
+                in_box = 0
+                for j in range(n):
+                    if X[i,j] >= C_l[j]-d_max and X[i,j] <= C_l[j]+d_max:
+                        in_box += 1
+                if in_box == n:  # X[i] is inside the box
+                    X_l.append(X[i])  # we add X[i] to the class with label l
+                    y_temp[i] = -1  # we assign temporary label -1
 
         # Binary Spherical Classification
         if center == 'fixed':
-            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X_box,y_temp,C1,C2)
+            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X,y_temp,C1,C2)
         elif center == 'free':
-            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(X_box,y_temp,C1,C2)
+            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(X,y_temp,C1,C2)
 
+        r_stack.append(r)
+        c_stack.append(c)
 
+        # assegna etichette in base ai punti dentro le sfere
 
-
-
-    return n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
+    return r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter
 
 
 
