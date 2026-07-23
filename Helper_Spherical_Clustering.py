@@ -22,15 +22,9 @@ def sliding_window(x,l,d):
         distances = []  # list of distances between all couples of points in the current window
 
         for j in range(len(window)):
-            for k in range(len(window)):
-                if k < j:
-                    distances.append(np.linalg.norm(window[j] - window[k]))
-
-        # alternatively (maybe), but it is too slow
-        # distance between consecutive points of the window
-        #for j in range(len(window)):
-        #    while j+1 <= len(window)-1:
-        #        distances.append(np.linalg.norm(window[j+1] - window[j]))
+            while j+1 <= len(window)-1:
+                distances.append(np.linalg.norm(window[j+1] - window[j]))
+                break
 
         d_max = max(distances)
         d_max = round(d_max,5)  # to handle numerical errors due to floating-point representation
@@ -101,7 +95,7 @@ def spherical_clustering_fit(X,l,d):
 
     n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
 
-    # classification of points
+    # clusters of points in R^1
     regions_idx = [[] for _ in range(n_regions)]
     outliers_idx = []
     for idx in X_pca_list_idx:
@@ -112,7 +106,6 @@ def spherical_clustering_fit(X,l,d):
         if xp in outliers:
             outliers_idx.append(idx)
 
-    # classification of (possible) double points
     if len(X_pca_double_idx) > 0:
         for idx in X_pca_double_idx:
             xd = X_pca[idx]
@@ -121,6 +114,49 @@ def spherical_clustering_fit(X,l,d):
                     r_idx.append(idx)
             if xd in outliers:
                 outliers_idx.append(idx)
+
+    # labels for points in R^n
+    y = np.zeros(m)
+    labels = range(n_regions+1)
+    for r_idx, l in zip(regions_idx,labels[1:]):
+        for i in r_idx:
+            y[i] = l
+    #for j in outliers_idx:
+    #    y[j] = labels[0]
+
+    # 1 vs all
+    for l in labels[1:]:
+        # creation of artificial binary dataset
+        y_temp = np.copy(y)
+        for i in range(m):
+            if y[i] == l:
+                y_temp[i] = 0
+            else:
+                y_temp[i] = 1
+        # binary spherical classification
+        if center == 'fixed':
+            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X,y_temp,C1,C2)
+            self.r_ = r
+            self.c_ = np.zeros(self.X_.shape[1])
+            self.xi_in_ = xi_in
+            self.xi_out_ = xi_out
+            self.in_class_ = in_class
+            self.out_class_ = out_class
+            self.in_label_ = in_label
+            self.out_label_ = out_label
+        elif self.center == 'free':
+            #r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_mosek(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
+            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(self.X_,self.y_,self.epsilon,self.minpts,self.C1,self.C2)
+            self.r_ = r
+            self.c_ = c
+            self.xi_in_ = xi_in
+            self.xi_out_ = xi_out
+            self.in_class_ = in_class
+            self.out_class_ = out_class
+            self.in_label_ = in_label
+            self.out_label_ = out_label
+
+
 
 
 

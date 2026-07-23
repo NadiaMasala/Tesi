@@ -48,11 +48,11 @@ def new_spherical_class_fit_semidef(X, y, epsilon, C1, C2):
 
     return r_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def spherical_class_fit_semidef_mosek(X, y, epsilon, minpts, C1, C2):
+def spherical_class_fit_semidef_mosek(X, y, C1, C2, epsilon=None, minpts=None):
     m = X.shape[0]
     n = X.shape[1]
 
-    #Selection of class in
+    # Selection of class in
     X_in, X_out, in_label, out_label = my_class_in_selection(X, y, epsilon, minpts)
     m_in = X_in.shape[0]
     m_out = X_out.shape[0]
@@ -232,7 +232,7 @@ def spherical_class_fit_semidef2_mosek(X, y, epsilon, minpts, C1, C2):
 
     return r_star, c_star, xi_in_star, xi_out_star, X_in, X_out, in_label, out_label
 
-def spherical_class_fit_semidef2_T_mosek(X, y, epsilon, minpts, C1, C2):
+def spherical_class_fit_semidef2_T_mosek(X, y, C1, C2, epsilon=None, minpts=None):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -374,7 +374,7 @@ def class_in_selection(X, y, epsilon):
     return in_class, out_class, in_label, out_label
 
 # My function for selection of class inside the sphere
-def my_class_in_selection(X, y, epsilon, minpts):
+def my_class_in_selection(X, y, epsilon=None, minpts=None):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -390,41 +390,47 @@ def my_class_in_selection(X, y, epsilon, minpts):
     A = np.array(A)
     B = np.array(B)
 
-    # Defining classes centroids
-    C_a = np.zeros(n)
-    C_b = np.zeros(n)
-    for j in range(n):
-        C_a[j] = np.mean(A[:, j])
-        C_b[j] = np.mean(B[:, j])
+    if epsilon, minpts == None:
+        in_class = A
+        out_class = B
+        in_label = labels[0]
+        out_label = labels[1]
+    else:
+        # Defining classes centroids
+        C_a = np.zeros(n)
+        C_b = np.zeros(n)
+        for j in range(n):
+            C_a[j] = np.mean(A[:, j])
+            C_b[j] = np.mean(B[:, j])
 
-    distancesA = {}
-    for i in range(A.shape[0]):
-        distancesA[i] = np.linalg.norm(C_a - A[i])
-    distancesB = {}
-    for j in range(B.shape[0]):
-        distancesB[j] = np.linalg.norm(C_b - B[j])
+        distancesA = {}
+        for i in range(A.shape[0]):
+            distancesA[i] = np.linalg.norm(C_a - A[i])
+        distancesB = {}
+        for j in range(B.shape[0]):
+            distancesB[j] = np.linalg.norm(C_b - B[j])
 
-    A_in = []  # points of A inside the sphere of radius = epsilon
-    for i in range(A.shape[0]):
-        if distancesA[i] <= epsilon:
-                A_in.append(A[i])
-    B_in = []  # points of B inside the sphere of radius = epsilon
-    for j in range(B.shape[0]):
-        if distancesB[j] <= epsilon:
-                B_in.append(B[j])
+        A_in = []  # points of A inside the sphere of radius = epsilon
+        for i in range(A.shape[0]):
+            if distancesA[i] <= epsilon:
+                    A_in.append(A[i])
+        B_in = []  # points of B inside the sphere of radius = epsilon
+        for j in range(B.shape[0]):
+            if distancesB[j] <= epsilon:
+                    B_in.append(B[j])
 
-    # Selection of the class that has to be inside the separation sphere
-    if len(A_in) >= minpts or len(B_in) >= minpts:
-        if len(A_in) >= len(B_in):
-            in_class = A
-            out_class = B
-            in_label = labels[0]
-            out_label = labels[1]
-        else:
-            in_class = B
-            out_class = A
-            in_label = labels[1]
-            out_label = labels[0]
+        # Selection of the class that has to be inside the separation sphere
+        if len(A_in) >= minpts or len(B_in) >= minpts:
+            if len(A_in) >= len(B_in):
+                in_class = A
+                out_class = B
+                in_label = labels[0]
+                out_label = labels[1]
+            else:
+                in_class = B
+                out_class = A
+                in_label = labels[1]
+                out_label = labels[0]
 
 
     return in_class, out_class, in_label, out_label

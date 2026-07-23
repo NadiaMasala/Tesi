@@ -81,14 +81,14 @@ for d in data_list:
         C1_par = list(np.linspace(1e-1, 1e+4, 4))
         C2_par = list(np.linspace(1e-1, 1e+4, 4))
         center_par = ['fixed','free']
-        selected_parameters = {'epsilon':epsilon_par, 'minpts':minpts_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
+        selected_parameters = {'C1':C1_par, 'C2':C2_par, 'center':center_par,'epsilon':epsilon_par, 'minpts':minpts_par}
         sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
         sc_grid.fit(X_train, y_train)
         best_params = sc_grid.best_params_
         f.write('Best hyperparameters = '+ str(best_params) + '\n')
 
         # Spherical Classification
-        sc = New_Spherical_Classifier(epsilon = best_params['epsilon'], minpts = best_params['minpts'], C1 = best_params['C1'], C2 = best_params['C2'], center = best_params['center'])
+        sc = New_Spherical_Classifier(C1 = best_params['C1'], C2 = best_params['C2'], center = best_params['center'],epsilon = best_params['epsilon'], minpts = best_params['minpts'])
         sc.fit(X_train, y_train)
         f.write('Class in = '+ str(sc.in_label_) + '\n')
         f.write('Optimal center = '+ str(sc.c_) + '\n')
