@@ -5,13 +5,13 @@ from New_Spherical_Class_class import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-# Sliding Window Algorithm for density regions along the real line
+# Sliding Window Algorithm for detection of density regions along the real line
 def sliding_window(x,l,d):
     n_regions = 0  # number of dense regions
     start = 0  # starting index
     n_iters = 0  # number of iterations
-    dense = 0  # flag is 1 if the last point is added to a dense region, 0 otherwise
-    regions = []  # list of dense and no dense (empty) regions
+    dense = 0  # flag: 1 if the last point is added to a dense region, 0 otherwise
+    regions = []  # list of dense regions of points
     outliers = []  # list of outliers
     while start+l <= len(x):
         n_iters += 1
@@ -26,7 +26,7 @@ def sliding_window(x,l,d):
                 if k < j:
                     distances.append(np.linalg.norm(window[j] - window[k]))
 
-        # alternatively, but it is too slow
+        # alternatively (maybe), but it is too slow
         # distance between consecutive points of the window
         #for j in range(len(window)):
         #    while j+1 <= len(window)-1:
@@ -38,13 +38,13 @@ def sliding_window(x,l,d):
         print(d_max)
 
         if d_max <= d:
-            if dense == 0:  # if we are at the first iteration or the previous region is not dense
+            if dense == 0:  # if we are at the first iteration or the previous window was not a dense region
                 # define a new dense region with the points of the current window
                 regions.append(window)
                 n_regions += 1
                 start += 1  # slide
                 dense = 1
-            elif dense == 1:  # if at the previous iteration the point was added to a dense region
+            elif dense == 1:  # if at the previous iteration we had a dense region
                 # add the last point of the current window in the last dense region found
                 regions[-1].append(window[-1])
                 start += 1  # slide
@@ -66,8 +66,8 @@ def sliding_window(x,l,d):
             else:
                 start = start+l-1
 
-
     return n_regions, regions, outliers, n_iters
+
 
 def spherical_clustering_fit(X,l,d):
     m = X.shape[0]

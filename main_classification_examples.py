@@ -16,9 +16,18 @@ from sklearn.metrics import accuracy_score, f1_score
 ns = 50
 nf = 2
 
-with open('experiments/example_fixed_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+with open('experiments/perf_sep_fixed'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
 
-    X, y = make_blobs(n_samples=50, centers=2, center_box=(-5,5), n_features=2, cluster_std=1.4, random_state=42)
+    #X, y = make_blobs(n_samples=ns, centers=2, center_box=(-2,2), n_features=nf, cluster_std=1.4)
+    ns_in = math.floor(0.5*ns)
+    ns_out = math.floor(0.25*ns)
+    X_in = 2*np.random.random_sample((ns_in,nf))-1
+    y_in = np.zeros(ns_in)
+    X_out = np.random.random_sample((ns_out,nf))-2
+    X_out = np.append(X_out, np.random.random_sample((ns_out,nf))+1, axis=0)
+    y_out = np.ones(2*ns_out)
+    X = np.append(X_in,X_out,axis=0)
+    y = np.append(y_in,y_out,axis=0)
 
     m = X.shape[0]
     n = X.shape[1]
@@ -87,9 +96,13 @@ with open('experiments/example_fixed_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
 
     # Spherical Classification
     sc = New_Spherical_Classifier(epsilon = best_params['epsilon'], minpts = best_params['minpts'], C1 = best_params['C1'], C2 = best_params['C2'], center = center_par)
-    sc.fit(X_train, y_train)
-    f.write('Class in = '+ str(sc.in_label_) + '\n')
-    f.write('Optimal center = '+ str(sc.c_) + '\n')
+    #sc.fit(X_train, y_train)
+    sc.fit(X, y)
+    if sc.in_label_ == labels[0]:
+        f.write('Class in = A, label in = ' +str(sc.in_label_)+ '\n')
+    elif sc.in_label_ == labels[1]:
+        f.write('Class in = B, label in = ' +str(sc.in_label_)+ ' \n')
+'''    f.write('Optimal center = '+ str(sc.c_) + '\n')
     y_train_pred = sc.predict(X_train)
     f.write('Classification report - Training set \n')
     f.write(classification_report(y_train, y_train_pred) + '\n')
@@ -103,20 +116,20 @@ with open('experiments/example_fixed_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
     f1_test = f1_score(y_test, y_test_pred)
     f1_tot = f1_score(y, sc.predict(X))
     f.write(str(ns)+ '&' +str(nf)+ '&' +str(round(acc_train,3))+ '&' +str(round(f1_train,3))+ '&' +str(round(acc_test,3))+ '&' +str(round(f1_test,3))+ '&' +str(round(acc_tot,3))+ '&' +str(round(f1_tot,3))+ '\\\\')
-
-
-    # Graphics
-    if nf == 2:
-        figure, axes = plt.subplots()
-        a_scatter = axes.scatter(A[:, 0], A[:, 1], facecolor="none", edgecolor="b", s=50, label='A')
-        b_scatter = axes.scatter(B[:, 0], B[:, 1], facecolor="none", edgecolor="r", s=50, label='B')
-        circle = plt.Circle((sc.c_[0], sc.c_[1]), sc.r_, color='black', fill=False)
-        axes.add_artist(circle)
-        axes.set_aspect(1)
-        all_x0 = np.concatenate((X[:, 0], [sc.c_[0] - sc.r_, sc.c_[0] + sc.r_]))
-        all_x1 = np.concatenate((X[:, 1], [sc.c_[1] - sc.r_, sc.c_[1] + sc.r_]))
-        axes.set_xlim(min(all_x0) - 1, max(all_x0) + 1)
-        axes.set_ylim(min(all_x1) - 1, max(all_x1) + 1)
-        axes.legend(handles=[a_scatter,b_scatter])
-        plt.title("Spherical Classification - n_samples = "+str(ns)+", n_features = "+str(nf))
-        plt.savefig('experiments/example_fixed_fig_'+str(ns)+'_'+str(nf)+'.pdf')
+'''
+# Graphics
+if nf == 2:
+    figure, axes = plt.subplots()
+    a_scatter = axes.scatter(A[:, 0], A[:, 1], facecolor="none", edgecolor="b", s=50, label='A')
+    b_scatter = axes.scatter(B[:, 0], B[:, 1], facecolor="none", edgecolor="r", s=50, label='B')
+    #circle = plt.Circle((sc.c_[0], sc.c_[1]), sc.r_, color='black', fill=False)
+    circle = plt.Circle((0,0), sc.r_, color='black', fill=False)
+    axes.add_artist(circle)
+    axes.set_aspect(1)
+    all_x0 = np.concatenate((X[:, 0], [sc.c_[0] - sc.r_, sc.c_[0] + sc.r_]))
+    all_x1 = np.concatenate((X[:, 1], [sc.c_[1] - sc.r_, sc.c_[1] + sc.r_]))
+    axes.set_xlim(min(all_x0) - 1, max(all_x0) + 1)
+    axes.set_ylim(min(all_x1) - 1, max(all_x1) + 1)
+    axes.legend(handles=[a_scatter,b_scatter])
+    #plt.title("Spherical Classification - n_samples = "+str(ns)+", n_features = "+str(nf))
+    plt.savefig('experiments/perf_sep_fixed_fig_'+str(ns)+'_'+str(nf)+'.pdf')
