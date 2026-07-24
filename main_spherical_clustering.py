@@ -24,7 +24,7 @@ d_par = [0.3,0.5,1]
 eps_par = [1,3,5]
 selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
 sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
-sc_grid.fit(X_train, y_train)
+sc_grid.fit(X_train)
 best_params = sc_grid.best_params_
 print('Best hyperparameters = '+ str(best_params) + '\n')
 
