@@ -12,13 +12,15 @@ class Spherical_Clustering:
         self.eps = eps
 
     def fit(self,X):
-
-        labels, r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter = spherical_clustering_fit(self.X_,self.l,self.d,self.eps)
+        labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter = spherical_clustering_fit(self.X_,self.l,self.d,self.eps)
         self.labels = labels
         self.r_stack = r_stack
         self.c_stack = c_stack
+        self.X_pca = X_pca
         self.n_regions = n_regions
+        self.regions = regions
         self.regions_idx = regions_idx
+        self.outliers = outliers
         self.outliers_idx = outliers_idx
         self.n_iter = n_iter
 

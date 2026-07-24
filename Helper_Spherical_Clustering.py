@@ -94,13 +94,6 @@ def spherical_clustering_fit(X,l,d,eps):
     X_pca_sorted = X_pca_list.sorted()
 
     n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
-    figure, axes = plt.subplots()
-    colors = cm.rainbow(np.linspace(0, 1, n_regions))
-    for reg, c in zip(regions, colors):
-        axes.scatter(reg, np.zeros(len(reg)), facecolor=c, edgecolor=c)
-    axes.scatter(outliers, np.zeros(len(outliers)), facecolor='gray', edgecolor='gray')
-    axes.set_xticks(points)
-    plt.savefig('experiments/sw_' + str(m) + '_' + str(n) + '_' + str(n_regions) + '.pdf')
 
     # clusters of points in R^1
     regions_idx = [[] for _ in range(n_regions)]
@@ -182,7 +175,7 @@ def spherical_clustering_fit(X,l,d,eps):
         c_stack.append(sc.c_)
         r_stack.append(sc.r_)
 
-    return labels, r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter
+    return labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
 
 def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
     y = np.zeros(m)  # outliers have label 0

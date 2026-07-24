@@ -47,24 +47,35 @@ for l in labels:
     for i in range(m):
         if y[i] == l:
             X_labeled[l].append(X[i])
+
+#Sliding Window graphic
+figure, axes = plt.subplots()
+colors = cm.rainbow(np.linspace(0, 1, s_clust.n_regions))
+for reg, c in zip(s_clust.regions, colors):
+    axes.scatter(reg, np.zeros(len(reg)), facecolor='none', edgecolor=c, s=50)
+axes.scatter(s_clust.outliers, np.zeros(len(s_clust.outliers)), facecolor='none', edgecolor='gray',s=50)
+axes.set_xticks(s_clust.X_pca)
+plt.savefig('clustering/sw_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
 # Graphics
 if n == 2:
     figure, axes = plt.subplots()
-    colors = cm.rainbow(np.linspace(0, 1, len(labels)))
-    for l, col in zip(labels, colors):
+    colors = cm.rainbow(np.linspace(0, 1, len(labels)-1))
+    for l, col in zip(labels[1:], colors):
         axes.scatter(X_labeled[l][:,0], X_labeled[l][:,1], facecolor="none", edgecolor=col, s=50)
+    axes.scatter(X_labeled[0][:,0], X_labeled[0][:,1], facecolor="none", edgecolor="gray", s=50)
     for c,r in zip(c_stack,r_stack):
         circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
         axes.add_artist(circle)
         axes.set_aspect(1)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('experiments/fig_clust2D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
+    plt.savefig('clustering/fig_clust2D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
 elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
-    colors = cm.rainbow(np.linspace(0, 1, len(labels)))
-    for l,col in zip(labels,colors):
+    colors = cm.rainbow(np.linspace(0, 1, len(labels)-1))
+    for l,col in zip(labels[1:],colors):
         axes.scatter(X_labeled[l][:,0], X_labeled[l][:,1], X_labeled[l][:,2], facecolor="none", edgecolor=col, s=50)
+    axes.scatter(X_labeled[0][:,0], X_labeled[0][:,1], X_labeled[0][:,2], facecolor="none", edgecolor="gray", s=50)
     # Parametrization of the spheres
     theta = np.linspace(0, 2 * np.pi, 20)
     phi = np.linspace(0, np.pi, 20)
@@ -78,6 +89,6 @@ elif n == 3:
         axes.set_ylabel('y')
         axes.set_zlabel('z')
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('experiments/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
+    plt.savefig('clustering/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
 
 
