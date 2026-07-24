@@ -58,7 +58,7 @@ if n == 2:
         axes.add_artist(circle)
         axes.set_aspect(1)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('experiments/fig_clust2D_'+str(m)+'_'+str(n)+', n_clusters = '+str(n_clust)+'.pdf')
+    plt.savefig('experiments/fig_clust2D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
 elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
@@ -78,6 +78,6 @@ elif n == 3:
         axes.set_ylabel('y')
         axes.set_zlabel('z')
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('experiments/fig_clust3D_'+str(m)+'_'+str(n)+', n_clusters = '+str(n_clust)+'.pdf')
+    plt.savefig('experiments/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
 
 
