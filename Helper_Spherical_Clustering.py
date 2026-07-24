@@ -63,7 +63,7 @@ def sliding_window(x,l,d):
     return n_regions, regions, outliers, n_iters
 
 
-def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
+def spherical_clustering_fit(X,l,d,eps):
     m = X.shape[0]
     n = X.shape[1]
 
@@ -83,13 +83,13 @@ def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
     # elimination of (possible) multiple points in X_pca
     X_pca_list = []
     X_pca_list_idx = []
-    X_pca_double_idx = []  # list of indexes of double points
+    X_pca_multi_idx = []  # list of indexes of (possible) multiple points
     for i in range(m):
         if X_pca[i] not in X_pca_list:
             X_pca_list.append(X_pca[i])
             X_pca_list_idx.append(i)
         else:
-            X_pca_double_idx.append(i)
+            X_pca_multi_idx.append(i)
 
     X_pca_sorted = X_pca_list.sorted()
 
@@ -106,41 +106,41 @@ def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
         if xp in outliers:
             outliers_idx.append(idx)
 
-    if len(X_pca_double_idx) > 0:
-        for idx in X_pca_double_idx:
-            xd = X_pca[idx]
+    if len(X_pca_multi_idx) > 0:
+        for idx in X_pca_multi_idx:
+            xm = X_pca[idx]
             for r_idx,reg in zip(regions_idx,regions):
-                if xd in reg:
+                if xm in reg:
                     r_idx.append(idx)
-            if xd in outliers:
+            if xm in outliers:
                 outliers_idx.append(idx)
 
     # labels for points in R^n
-    y = np.zeros(m)
+    y_pca = np.zeros(m)
     labels = range(n_regions+1)
-    for r_idx, l in zip(regions_idx,labels[1:]):
+    for r_idx,l in zip(regions_idx,labels[1:]):
         for i in r_idx:
-            y[i] = l
+            y_pca[i] = l
     #for j in outliers_idx:
-    #    y[j] = labels[0]
+    #    y_pca[j] = labels[0]
 
     # Multiclass Spherical Classification - 1-vs-all
-    y_temp = np.copy(y)
+    y_temp = np.copy(y_pca)
     r_stack = []
     c_stack = []
     for l in labels[1:]:
         # creation of artificial binary dataset
-        X_l = []
-        C_l = np.zeros(n)
+        X_l = []  # box of points of X with label l for binary classification
+        C_l = np.zeros(n)  # centroid of points with label l due to PCA
         for i in range(m):
-            if y[i] == l:
+            if y_pca[i] == l:
                 X_l.append(X[i])
                 y_temp[i] = -1
             else:
                 y_temp[i] = +1
         for i in range(X_l.shape[0]):
             for j in range(n):
-                C_l[j] = np.mean(X_l[:, j])
+                C_l[j] = np.mean(X_l[:,j])
         distances_l = {}
         for i in range(X_l.shape[0]):
             distances_l[i] = np.linalg.norm(C_l - X_l[i])
@@ -148,7 +148,7 @@ def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
         d_max = d_l_max + eps
         for i in range(m):
             if X[i] not in X_l:
-                in_box = 0
+                in_box = 0  # counter for points in the box
                 for j in range(n):
                     if X[i,j] >= C_l[j]-d_max and X[i,j] <= C_l[j]+d_max:
                         in_box += 1
@@ -157,17 +157,36 @@ def spherical_clustering_fit(X,l,d,C1,C2,center,eps):
                     y_temp[i] = -1  # we assign temporary label -1
 
         # Binary Spherical Classification
-        if center == 'fixed':
-            r, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef_mosek(X,y_temp,C1,C2)
-        elif center == 'free':
-            r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(X,y_temp,C1,C2)
+        X_train, X_test, y_train, y_test = train_test_split(X, y_temp, test_size=0.2)
+        C1_par = list(np.linspace(1e-1, 1e+4, 4))
+        C2_par = list(np.linspace(1e-1, 1e+4, 4))
+        center_par = ['fixed', 'free']
+        selected_parameters = {'C1': C1_par, 'C2': C2_par, 'center': center_par}
+        sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose=10, n_jobs=10)
+        sc_grid.fit(X_train, y_train)
+        sc = New_Spherical_Classifier(C1=best_params['C1'], C2=best_params['C2'], center=best_params['center'])
+        sc.fit(X_train, y_train)
+        y_train_pred = sc.predict(X_train)
+        print('Classification report - Training set - label = ',l)
+        print(classification_report(y_train, y_train_pred))
+        y_test_pred = sc.predict(X_test)
+        print('Classification report - Test set - label = ',l)
+        print(classification_report(y_test, y_test_pred))
+        c_stack.append(sc.c_)
+        r_stack.append(sc.r_)
 
-        r_stack.append(r)
-        c_stack.append(c)
+    return labels, r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter
 
-        # assegna etichette in base ai punti dentro le sfere
+def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
+    y = []
+    for r,c,l in zip(r_stack,c_stack,labels[1:]):
+        for i in range(X.shape[0]):
+            if np.linalg.norm(X[i],c) <= r:
+                y[i] = l
+    return y
 
-    return r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter
+
+
 
 
 
