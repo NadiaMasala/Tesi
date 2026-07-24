@@ -1,18 +1,18 @@
+# Class for Spherical Clustering
+
 import numpy as np
+from sklearn.base import BaseEstimator , ClassifierMixin
 from Helper_Spherical_Clustering import *
 
-class Spherical_Clustering:
+class Spherical_Clustering( BaseEstimator , ClassifierMixin ):
 
-    def __init__(self,l=3,d=0.3,C1=1.0,C2=1.0,center='free',eps=1.0):
+    def __init__(self,l=3,d=0.3,eps=1.0):
         self.l = l
         self.d = d
-        self.C1 = C1
-        self.C2 = C2
-        self.center = center
         self.eps = eps
 
     def fit(self,X):
-        labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter = spherical_clustering_fit(self.X_,self.l,self.d,self.eps)
+        labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter = spherical_clustering_fit(X,self.l,self.d,self.eps)
         self.labels = labels
         self.r_stack = r_stack
         self.c_stack = c_stack

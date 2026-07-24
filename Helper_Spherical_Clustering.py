@@ -1,7 +1,7 @@
 # Helper functions for Spherical Clustering
 
 import numpy as np
-from New_Spherical_Class_class import *
+from New_Spherical_Class_class import New_Spherical_Classifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
@@ -91,7 +91,7 @@ def spherical_clustering_fit(X,l,d,eps):
         else:
             X_pca_multi_idx.append(i)
 
-    X_pca_sorted = X_pca_list.sorted()
+    X_pca_sorted = X_pca_list.sort()
 
     n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
 

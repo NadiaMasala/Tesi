@@ -390,7 +390,7 @@ def my_class_in_selection(X, y, epsilon=None, minpts=None):
     A = np.array(A)
     B = np.array(B)
 
-    if epsilon, minpts == None:
+    if epsilon == None and minpts == None:
         in_class = A
         out_class = B
         in_label = labels[0]
