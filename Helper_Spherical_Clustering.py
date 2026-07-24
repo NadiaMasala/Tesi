@@ -178,11 +178,12 @@ def spherical_clustering_fit(X,l,d,eps):
     return labels, r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter
 
 def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
-    y = []
+    y = np.zeros(m)  # outliers have label 0
     for r,c,l in zip(r_stack,c_stack,labels[1:]):
         for i in range(X.shape[0]):
             if np.linalg.norm(X[i],c) <= r:
                 y[i] = l
+
     return y
 
 

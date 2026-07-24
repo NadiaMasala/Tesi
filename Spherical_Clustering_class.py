@@ -12,7 +12,6 @@ class Spherical_Clustering:
         self.eps = eps
 
     def fit(self,X):
-        self.X_ = X
 
         labels, r_stack, c_stack, n_regions, regions_idx, outliers_idx, n_iter = spherical_clustering_fit(self.X_,self.l,self.d,self.eps)
         self.labels = labels
@@ -25,7 +24,8 @@ class Spherical_Clustering:
 
         return self
 
-    def assign_labels(self):
+    def assign_labels(self,X):
         y = spherical_clust_assign_labels(self.X_, self.labels, self.r_stack, self.c_stack)
+        self.y = y
 
-        return self
+        return self.y
