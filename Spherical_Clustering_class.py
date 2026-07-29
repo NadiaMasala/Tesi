@@ -27,7 +27,7 @@ class Spherical_Clustering( BaseEstimator , ClassifierMixin ):
         return self
 
     def assign_labels(self,X):
-        y = spherical_clust_assign_labels(self.X_, self.labels, self.r_stack, self.c_stack)
+        y = spherical_clust_assign_labels(X, self.labels, self.r_stack, self.c_stack)
         self.y = y
 
         return self.y

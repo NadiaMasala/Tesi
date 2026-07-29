@@ -4,6 +4,9 @@ import numpy as np
 from New_Spherical_Class_class import New_Spherical_Classifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
 
 # Sliding Window Algorithm for detection of density regions along the real line
 def sliding_window(x,l,d):
@@ -91,7 +94,7 @@ def spherical_clustering_fit(X,l,d,eps):
         else:
             X_pca_multi_idx.append(i)
 
-    X_pca_sorted = X_pca_list.sort()
+    X_pca_sorted = sorted(X_pca_list)
 
     n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
 
@@ -138,13 +141,14 @@ def spherical_clustering_fit(X,l,d,eps):
                 y_temp[i] = -1
             else:
                 y_temp[i] = +1
+        X_l = np.array(X_l)
         for i in range(X_l.shape[0]):
             for j in range(n):
                 C_l[j] = np.mean(X_l[:,j])
         distances_l = {}
         for i in range(X_l.shape[0]):
             distances_l[i] = np.linalg.norm(C_l - X_l[i])
-        d_l_max = max(distances_l.value())
+        d_l_max = max(distances_l.values())
         d_max = d_l_max + eps
         for i in range(m):
             if X[i] not in X_l:
@@ -153,35 +157,36 @@ def spherical_clustering_fit(X,l,d,eps):
                     if X[i,j] >= C_l[j]-d_max and X[i,j] <= C_l[j]+d_max:
                         in_box += 1
                 if in_box == n:  # X[i] is inside the box
-                    X_l.append(X[i])  # we add X[i] to the class with label l
+                    X_l = np.append(X_l,X[i].reshape((1,n)),axis=0)  # we add X[i] to the class with label l
                     y_temp[i] = -1  # we assign temporary label -1
 
         # Binary Spherical Classification
-        X_train, X_test, y_train, y_test = train_test_split(X, y_temp, test_size=0.2)
+        X_train, X_test, y_train, y_test = train_test_split(X, y_temp, test_size=0.2, stratify=y_temp)
         C1_par = list(np.linspace(1e-1, 1e+4, 4))
         C2_par = list(np.linspace(1e-1, 1e+4, 4))
         center_par = ['fixed', 'free']
         selected_parameters = {'C1': C1_par, 'C2': C2_par, 'center': center_par}
         sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose=10, n_jobs=10)
         sc_grid.fit(X_train, y_train)
+        best_params = sc_grid.best_params_
         sc = New_Spherical_Classifier(C1=best_params['C1'], C2=best_params['C2'], center=best_params['center'])
         sc.fit(X_train, y_train)
-        y_train_pred = sc.predict(X_train)
-        print('Classification report - Training set - label = ',l)
-        print(classification_report(y_train, y_train_pred))
-        y_test_pred = sc.predict(X_test)
-        print('Classification report - Test set - label = ',l)
-        print(classification_report(y_test, y_test_pred))
+        #y_train_pred = sc.predict(X_train)
+        #print('Classification report - Training set - label = ',l)
+        #print(classification_report(y_train, y_train_pred))
+        #y_test_pred = sc.predict(X_test)
+        #print('Classification report - Test set - label = ',l)
+        #print(classification_report(y_test, y_test_pred))
         c_stack.append(sc.c_)
         r_stack.append(sc.r_)
 
     return labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
 
 def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
-    y = np.zeros(m)  # outliers have label 0
+    y = np.zeros(X.shape[0])  # outliers have label 0
     for r,c,l in zip(r_stack,c_stack,labels[1:]):
         for i in range(X.shape[0]):
-            if np.linalg.norm(X[i],c) <= r:
+            if np.linalg.norm(X[i]-c) <= r:
                 y[i] = l
 
     return y

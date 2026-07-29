@@ -12,16 +12,16 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 from Spherical_Clustering_class import Spherical_Clustering
 
-m = 20
+m = 100
 n = 2
 X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
 # Selection of values of hyperparameters by Grid Search
 l_par = [3,4,5]
-d_par = [0.3,0.5,1]
-eps_par = [1,3,5]
+d_par = [0.2,0.3,0.5]
+eps_par = [0.3,0.5,1]
 selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
 sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
 sc_grid.fit(X_train)
@@ -32,20 +32,32 @@ print('Best hyperparameters = '+ str(best_params) + '\n')
 s_clust = Spherical_Clustering(l = best_params['l'], d = best_params['d'], eps = best_params['eps'])
 s_clust.fit(X)
 c_stack = s_clust.c_stack
+print(c_stack)
 r_stack = s_clust.r_stack
-y = s_clust.assign_labels(X)
-labels = np.unique(y)
+print(r_stack)
+y_clust = s_clust.assign_labels(X)
+print(y_clust)
+labels = np.unique(y_clust)
+print(labels)
 n_clust = len(labels)-1
 
-DB_index = davies_bouldin_score(X,y)
+figure, axes = plt.subplots()
+plt.scatter(X[:,0],X[:,1],c=y, s=50)
+for c,r in zip(c_stack,r_stack):
+    circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
+    axes.add_artist(circle)
+    axes.set_aspect(1)
+plt.show()
+
+'''DB_index = davies_bouldin_score(X,y)
 print(DB_index)
 SC_index = silhouette_score(X,y)
-print(SC_index)
+print(SC_index)'''
 
 X_labeled = [[] for _ in range(len(labels))]
-for l in labels:
+for l,lab in zip(range(len(labels)),labels):
     for i in range(m):
-        if y[i] == l:
+        if y[i] == lab:
             X_labeled[l].append(X[i])
 
 #Sliding Window graphic
@@ -54,7 +66,8 @@ colors = cm.rainbow(np.linspace(0, 1, s_clust.n_regions))
 for reg, c in zip(s_clust.regions, colors):
     axes.scatter(reg, np.zeros(len(reg)), facecolor='none', edgecolor=c, s=50)
 axes.scatter(s_clust.outliers, np.zeros(len(s_clust.outliers)), facecolor='none', edgecolor='gray',s=50)
-axes.set_xticks(s_clust.X_pca)
+plt.show()
+quit()
 plt.savefig('clustering/sw_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
 # Graphics
 if n == 2:
