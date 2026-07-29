@@ -21,7 +21,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratif
 # Selection of values of hyperparameters by Grid Search
 l_par = [3,4,5]
 d_par = [0.2,0.3,0.5]
-eps_par = [0.3,0.5,1]
+eps_par = [0.2,0.3,0.5]
 selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
 sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
 sc_grid.fit(X_train)
