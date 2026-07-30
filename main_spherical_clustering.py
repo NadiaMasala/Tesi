@@ -12,53 +12,57 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 from Spherical_Clustering_class import Spherical_Clustering
 
-m = 100
+m = 20
 n = 2
-X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+with open('clustering/dataset_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+    f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs)\n')
+    X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8)
 
-# Selection of values of hyperparameters by Grid Search
-l_par = [3,4,5]
-d_par = [0.2,0.3,0.5]
-eps_par = [0.2,0.3,0.5]
-selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
-sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
-sc_grid.fit(X_train)
-best_params = sc_grid.best_params_
-print('Best hyperparameters = '+ str(best_params) + '\n')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
-# Spherical Clustering
-s_clust = Spherical_Clustering(l = best_params['l'], d = best_params['d'], eps = best_params['eps'])
-s_clust.fit(X)
-c_stack = s_clust.c_stack
-print(c_stack)
-r_stack = s_clust.r_stack
-print(r_stack)
-y_clust = s_clust.assign_labels(X)
-print(y_clust)
-labels = np.unique(y_clust)
-print(labels)
-n_clust = len(labels)-1
+    # Selection of values of hyperparameters by Grid Search
+    l_par = [3,4,5]
+    d_par = [0.2,0.3,0.5]
+    eps_par = [0.2,0.3,0.5]
+    selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
+    sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
+    sc_grid.fit(X_train)
+    best_params = sc_grid.best_params_
+    f.write('Best hyperparameters = ' + str(best_params) + '\n')
 
-figure, axes = plt.subplots()
-plt.scatter(X[:,0],X[:,1],c=y, s=50)
-for c,r in zip(c_stack,r_stack):
-    circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
-    axes.add_artist(circle)
-    axes.set_aspect(1)
-plt.show()
+    # Spherical Clustering
+    s_clust = Spherical_Clustering(l = best_params['l'], d = best_params['d'], eps = best_params['eps'])
+    s_clust.fit(X)
+    c_stack = s_clust.c_stack
+    r_stack = s_clust.r_stack
+    y_clust = s_clust.assign_labels(X)
+    labels = (np.unique(y_clust)).tolist()
+    n_clust = len(labels)-1
+    f.write('Centers stack = ' + str(c_stack) + '\n')
+    f.write('Radius stack = ' + str(r_stack) + '\n')
+    f.write('Number of clusters = ' + str(n_clust) + '\n')
 
-'''DB_index = davies_bouldin_score(X,y)
-print(DB_index)
-SC_index = silhouette_score(X,y)
-print(SC_index)'''
+    DB_index = davies_bouldin_score(X,y_clust)
+    SC_index = silhouette_score(X,y_clust)
+    f.write('DB_index = ' + str(DB_index) + '\n')
+    f.write('SC_index = ' + str(SC_index) + '\n')
+
+    f.write(str(m) + '&' + str(n) + '&' + str(n_clust) + '&' + str(round(DB_index, 3)) + '&' + str(round(SC_index, 3)) + '\\\\')
 
 X_labeled = [[] for _ in range(len(labels))]
 for l,lab in zip(range(len(labels)),labels):
     for i in range(m):
-        if y[i] == lab:
+        if y_clust[i] == lab:
             X_labeled[l].append(X[i])
+print('X_labeled = ',X_labeled)
+print('X_labeled[0][:][0] = ',X_labeled[0][:][0])
+print('X_labeled[0][:][1] = ',X_labeled[0][:][1])
+for l in range(len(X_labeled))[1:]:
+    print(X_labeled[l][:][0])
+
+quit()
+
 
 #Sliding Window graphic
 figure, axes = plt.subplots()
@@ -66,16 +70,15 @@ colors = cm.rainbow(np.linspace(0, 1, s_clust.n_regions))
 for reg, c in zip(s_clust.regions, colors):
     axes.scatter(reg, np.zeros(len(reg)), facecolor='none', edgecolor=c, s=50)
 axes.scatter(s_clust.outliers, np.zeros(len(s_clust.outliers)), facecolor='none', edgecolor='gray',s=50)
-plt.show()
-quit()
 plt.savefig('clustering/sw_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+
 # Graphics
 if n == 2:
     figure, axes = plt.subplots()
     colors = cm.rainbow(np.linspace(0, 1, len(labels)-1))
-    for l, col in zip(labels[1:], colors):
-        axes.scatter(X_labeled[l][:,0], X_labeled[l][:,1], facecolor="none", edgecolor=col, s=50)
-    axes.scatter(X_labeled[0][:,0], X_labeled[0][:,1], facecolor="none", edgecolor="gray", s=50)
+    for l, col in zip(range(len(X_labeled))[1:], colors):
+        axes.scatter(X_labeled[l][:][0], X_labeled[l][:][1], facecolor="none", edgecolor=col, s=50)
+    axes.scatter(X_labeled[0][:][0], X_labeled[0][:][1], facecolor="none", edgecolor="gray", s=50)
     for c,r in zip(c_stack,r_stack):
         circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
         axes.add_artist(circle)
@@ -86,9 +89,9 @@ elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
     colors = cm.rainbow(np.linspace(0, 1, len(labels)-1))
-    for l,col in zip(labels[1:],colors):
-        axes.scatter(X_labeled[l][:,0], X_labeled[l][:,1], X_labeled[l][:,2], facecolor="none", edgecolor=col, s=50)
-    axes.scatter(X_labeled[0][:,0], X_labeled[0][:,1], X_labeled[0][:,2], facecolor="none", edgecolor="gray", s=50)
+    for l,col in zip(range(len(X_labeled))[1:], colors):
+        axes.scatter(X_labeled[l][:][0], X_labeled[l][:][1], X_labeled[l][:][2], facecolor="none", edgecolor=col, s=50)
+    axes.scatter(X_labeled[0][:][0], X_labeled[0][:][1], X_labeled[0][:][2], facecolor="none", edgecolor="gray", s=50)
     # Parametrization of the spheres
     theta = np.linspace(0, 2 * np.pi, 20)
     phi = np.linspace(0, np.pi, 20)

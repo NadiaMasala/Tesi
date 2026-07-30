@@ -72,16 +72,11 @@ def spherical_clustering_fit(X,l,d,eps):
 
     # scaling for PCA
     scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(X)
 
     # reduction to dimension 1
     pca = PCA(n_components = 1,copy=True)
-    X_pca = pca.fit_transform(X)
-
-    # saving of indexes of points in a dictionary
-    #X_pca_dict = {}
-    #for i in range(m):
-    #    X_pca_dict[i] = X_pca[i]
+    X_pca = pca.fit_transform(X_scaled)
 
     # elimination of (possible) multiple points in X_pca
     X_pca_list = []
