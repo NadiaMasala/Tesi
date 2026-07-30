@@ -2,6 +2,7 @@
 
 import math
 import matplotlib
+matplotlib.use('QtAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
@@ -12,12 +13,13 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 from Spherical_Clustering_class import Spherical_Clustering
 
+
 m = 50
-n = 2
+n = 3
 
 with open('clustering/dataset_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
     f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs)\n')
-    X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8, random_state=42)
+    X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
@@ -53,11 +55,11 @@ with open('clustering/dataset_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
 
     f.write(str(m) + '&' + str(n) + '&' + str(n_clust) + '&' + str(round(DB_index, 3)) + '&' + str(round(SC_index, 3)) + '\\\\')
 
-X_labeled = [[] for _ in range(len(labels))]
-for l,lab in zip(range(len(labels)),labels):
-    for i in range(m):
-        if y_clust[i] == lab:
-            X_labeled[l].append(X[i])
+#X_labeled = [[] for _ in range(len(labels))]
+#for l,lab in zip(range(len(labels)),labels):
+#    for i in range(m):
+#        if y_clust[i] == lab:
+#            X_labeled[l].append(X[i])
 
 # Sliding Window graphic
 figure, axes = plt.subplots()
@@ -70,7 +72,7 @@ plt.savefig('clustering/sw_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regio
 # Graphics
 if n == 2:
     figure, axes = plt.subplots()
-    axes.scatter(X[:, 0], X[:, 1], c=colors)
+    axes.scatter(X[:, 0], X[:, 1], c=y_clust)
     for c, r in zip(c_stack, r_stack):
         circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
         axes.add_artist(circle)
@@ -80,11 +82,7 @@ if n == 2:
 elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
-    #colors = cm.rainbow(np.linspace(0, 1, len(labels)-1))
-    #for l,col in zip(range(len(X_labeled))[1:], colors):
-    #    axes.scatter(X_labeled[l][:][0], X_labeled[l][:][1], X_labeled[l][:][2], facecolor="none", edgecolor=col, s=50)
-    #axes.scatter(X_labeled[0][:][0], X_labeled[0][:][1], X_labeled[0][:][2], facecolor="none", edgecolor="gray", s=50)
-    axes.scatter(X[:, 0], X[:, 1], X[:, 2], c=y_clust)
+    axes.scatter3D(X[:, 0], X[:, 1], X[:, 2], c=y_clust)
     # Parametrization of the spheres
     theta = np.linspace(0, 2 * np.pi, 20)
     phi = np.linspace(0, np.pi, 20)
@@ -93,11 +91,16 @@ elif n == 3:
         y = c[1] + r * np.outer(np.sin(phi), np.sin(theta))
         z = c[2] + r * np.outer(np.cos(phi), np.ones_like(theta))
         # 3D graphic
-        axes.plot_surface(x,y,z, color='white', edgecolor='lightblue', alpha=0.3)
+        axes.plot_wireframe(x,y,z, color='k', linewidth=0.5)
         axes.set_xlabel('x')
         axes.set_ylabel('y')
         axes.set_zlabel('z')
+    axes.set_xlim(-20, 20)
+    axes.set_ylim(-20, 20)
+    axes.set_zlim(-20, 20)
+    axes.set_box_aspect([1,1,1])
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
+    plt.show()
+    #plt.savefig('clustering/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
 
 
