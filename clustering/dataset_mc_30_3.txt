@@ -1,0 +1,2 @@
+Synthetic dataset for clustering with n_samples=30 and n_features=3
+(make_classification - class_sep=1.3)

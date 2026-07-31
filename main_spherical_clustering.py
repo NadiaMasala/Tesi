@@ -8,30 +8,34 @@ import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_blobs
+from sklearn.datasets import make_blobs, make_classification
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 from Spherical_Clustering_class import Spherical_Clustering
 
 
-m = 50
-n = 3
+m = 30
+n = 2
 
-with open('clustering/dataset_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
-    f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs)\n')
-    X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=0.8)
+with open('clustering/dataset_mc_noout_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+    #f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs - cluster_std=1.4)\n')
+    #X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=1.4)  # cluster_std=0.8 for perfectly separable clusters
+
+    f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_classification - class_sep=1.3)\n')
+    X, y = make_classification(m, n, n_classes=3, n_clusters_per_class=1, class_sep=1.3, n_informative=n, n_redundant=0, n_repeated=0, random_state=42)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
     # Selection of values of hyperparameters by Grid Search
     l_par = [3,4,5]
     d_par = [0.2,0.3,0.5]
-    eps_par = [0.2,0.3,0.5]
+    #eps_par = [0.2,0.3,0.5]
+    eps_par = [0.5, 1, 2]
     selected_parameters = {'l':l_par,'d':d_par,'eps':eps_par}
     sc_grid = GridSearchCV(Spherical_Clustering(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
     sc_grid.fit(X_train)
     best_params = sc_grid.best_params_
-    f.write('Best hyperparameters = ' + str(best_params) + '\n')
+    f.write('Best hyperparameters = ' + str(best_params) + '(eps_par = [0.5, 1, 2])' +'\n')
 
     # Spherical Clustering
     s_clust = Spherical_Clustering(l = best_params['l'], d = best_params['d'], eps = best_params['eps'])
@@ -40,34 +44,52 @@ with open('clustering/dataset_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
     r_stack = s_clust.r_stack
     y_clust = s_clust.assign_labels(X)
     labels = (np.unique(y_clust)).tolist()
-    n_clust = len(labels)-1
+
+    n_clust = 0
+    for l in labels:
+        if l != 0:
+            n_clust += 1
+
     n_regions = s_clust.n_regions
     regions = s_clust.regions
     outliers = s_clust.outliers
+
+    X_in_clusters = []
+    X_outliers = []
+    for i in range(m):
+        if y_clust[i] != 0:
+            X_in_clusters.append(X[i])
+        else:
+            X_outliers.append(X[i])
+    y_clust_no_out = []
+    for i in range(m):
+        if y_clust[i] != 0:
+            y_clust_no_out.append(y_clust[i])
+
     f.write('Centers stack = ' + str(c_stack) + '\n')
     f.write('Radius stack = ' + str(r_stack) + '\n')
     f.write('Number of clusters = ' + str(n_clust) + '\n')
 
-    DB_index = davies_bouldin_score(X,y_clust)
-    SC_index = silhouette_score(X,y_clust)
-    f.write('DB_index = ' + str(DB_index) + '\n')
-    f.write('SC_index = ' + str(SC_index) + '\n')
+    #DB_index = davies_bouldin_score(X,y_clust)
+    #SC_index = silhouette_score(X,y_clust)
+    #f.write('DB_index = ' + str(DB_index) + '\n')
+    #f.write('SC_index = ' + str(SC_index) + '\n')
+    DB_index = davies_bouldin_score(X_in_clusters, y_clust_no_out)
+    SC_index = silhouette_score(X_in_clusters, y_clust_no_out)
+    f.write('DB_index = ' + str(DB_index) + '(no outliers)\n')
+    f.write('SC_index = ' + str(SC_index) + '(no outliers)\n')
 
-    f.write(str(m) + '&' + str(n) + '&' + str(n_clust) + '&' + str(round(DB_index, 3)) + '&' + str(round(SC_index, 3)) + '\\\\')
-
-#X_labeled = [[] for _ in range(len(labels))]
-#for l,lab in zip(range(len(labels)),labels):
-#    for i in range(m):
-#        if y_clust[i] == lab:
-#            X_labeled[l].append(X[i])
+    #f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index, 3)) + ' & ' + str(round(SC_index, 3)) + '\\\\')
 
 # Sliding Window graphic
 figure, axes = plt.subplots()
 colors = cm.rainbow(np.linspace(0,1,n_regions+1))
 for reg, c in zip(regions,colors[1:]):
     axes.scatter(reg,np.zeros(len(reg)), facecolor='none', edgecolor=c)
-axes.scatter(outliers, np.zeros(len(outliers)), facecolor='none', edgecolor=colors[0])
-plt.savefig('clustering/sw_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+if len(outliers) > 0:
+    axes.scatter(outliers, np.zeros(len(outliers)), facecolor='none', edgecolor=colors[0])
+plt.savefig('clustering/sw_mc_noout_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+plt.show()
 
 # Graphics
 if n == 2:
@@ -77,8 +99,11 @@ if n == 2:
         circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
         axes.add_artist(circle)
         axes.set_aspect(1)
+    axes.set_xlim(-20, 20)
+    axes.set_ylim(-20, 20)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust2D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
+    plt.savefig('clustering/fig_clust2D_mc_noout_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    plt.show()
 elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
@@ -100,7 +125,8 @@ elif n == 3:
     axes.set_zlim(-20, 20)
     axes.set_box_aspect([1,1,1])
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
+    plt.savefig('clustering/fig_clust3D_mc_noout_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
     plt.show()
-    #plt.savefig('clustering/fig_clust3D_'+str(m)+'_'+str(n)+'_'+str(n_clust)+'.pdf')
+
 
 

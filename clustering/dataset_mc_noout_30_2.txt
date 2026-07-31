@@ -1,0 +1,8 @@
+Synthetic dataset for clustering with n_samples=30 and n_features=2
+(make_classification - class_sep=1.3)
+Best hyperparameters = {'d': 0.2, 'eps': 0.5, 'l': 3}(eps_par = [0.5, 1, 2])
+Centers stack = [array([-1.71587991, -1.4192711 ]), array([-1.36529636,  1.23302909]), array([-1.03033645,  1.64528207]), array([0.00188996, 1.67055452]), array([2.34710539, 0.89231278])]
+Radius stack = [np.float64(0.7710029018826012), np.float64(0.8073028370243762), np.float64(0.430846785422999), np.float64(0.9162212240948174), np.float64(0.520412662018499)]
+Number of clusters = 4
+DB_index = 0.48482213938555413(no outliers)
+SC_index = 0.5973619266140302(no outliers)

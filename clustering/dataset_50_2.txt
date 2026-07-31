@@ -1,0 +1,9 @@
+Synthetic dataset for clustering with n_samples=50 and n_features=2
+(make_blobs)
+Best hyperparameters = {'d': 0.2, 'eps': 0.2, 'l': 3}
+Centers stack = [array([-9.29659726, -1.32453919]), array([0.26329183, 2.07304658]), array([5.7294902 , 6.00816654])]
+Radius stack = [np.float64(1.20267153906738), np.float64(1.5897767790382997), np.float64(2.1018233078561805)]
+Number of clusters = 3
+DB_index = 1.1534912701840323
+SC_index = 0.5040108677149242
+50&2&3&1.153&0.504\\
