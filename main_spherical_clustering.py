@@ -17,8 +17,8 @@ from Spherical_Clustering_class import Spherical_Clustering
 m = 40
 n = 3
 
-with open('clustering/dataset_mb_new2_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
-#with open('clustering/dataset_mc_new2_' + str(m) + '_' + str(n) + '.txt', 'w') as f:
+with open('clustering/dataset_mb_new22_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+#with open('clustering/dataset_mc_new22_' + str(m) + '_' + str(n) + '.txt', 'w') as f:
     f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs - cluster_std=1.4)\n')
     X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=1.4)  # cluster_std=0.8 for perfectly separable clusters
 
@@ -94,8 +94,8 @@ for reg, c in zip(regions,colors[1:]):
     axes.scatter(reg,np.zeros(len(reg)), facecolor='none', edgecolor=c)
 if len(outliers) > 0:
     axes.scatter(outliers, np.zeros(len(outliers)), facecolor='none', edgecolor=colors[0])
-plt.savefig('clustering/sw_mb_new2_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
-#plt.savefig('clustering/sw_mc_new2_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+plt.savefig('clustering/sw_mb_new22_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+#plt.savefig('clustering/sw_mc_new22_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
 plt.show()
 
 # Graphics
@@ -110,9 +110,28 @@ if n == 2:
     axes.set_ylim(-20, 20)
     axes.set_box_aspect(1)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    #plt.savefig('clustering/fig_clust2D_mc_new2_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
-    plt.savefig('clustering/fig_clust2D_mb_new2_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    #plt.savefig('clustering/fig_clust2D_mc_new22_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    plt.savefig('clustering/fig_clust2D_mb_new22_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
     plt.show()
+
+    figure, axes = plt.subplots()
+    axes.scatter(X[:, 0], X[:, 1], c=y_clust)
+    for l in labels:
+        if l != 0:
+            for j, k, c, r in zip(range(len(c_stack)), range(len(r_stack)),c_stack, r_stack):
+                if j == l-1 and k == l-1:
+                    circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
+                    axes.add_artist(circle)
+                    axes.set_aspect(1)
+    axes.set_xlim(-20, 20)
+    axes.set_ylim(-20, 20)
+    axes.set_box_aspect(1)
+    plt.title(
+        "Spherical Clustering - n_samples = " + str(m) + ", n_features = " + str(n) + ", n_clusters = " + str(n_clust))
+    #plt.savefig('clustering/fig2_clust2D_mc_new22_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    plt.savefig('clustering/fig2_clust2D_mb_new22_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '_' + '.pdf')
+    plt.show()
+
 elif n == 3:
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
@@ -120,22 +139,50 @@ elif n == 3:
     # Parametrization of the spheres
     theta = np.linspace(0, 2 * np.pi, 20)
     phi = np.linspace(0, np.pi, 20)
-    for c,r in zip(c_stack,r_stack):
+    for c, r in zip(c_stack, r_stack):
         x = c[0] + r * np.outer(np.sin(phi), np.cos(theta))
         y = c[1] + r * np.outer(np.sin(phi), np.sin(theta))
         z = c[2] + r * np.outer(np.cos(phi), np.ones_like(theta))
         # 3D graphic
-        axes.plot_wireframe(x,y,z, color='k', linewidth=0.5)
+        axes.plot_wireframe(x, y, z, color='k', linewidth=0.5)
         axes.set_xlabel('x')
         axes.set_ylabel('y')
         axes.set_zlabel('z')
     axes.set_xlim(-20, 20)
     axes.set_ylim(-20, 20)
     axes.set_zlim(-20, 20)
-    axes.set_box_aspect([1,1,1])
-    plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    #plt.savefig('clustering/fig_clust3D_mc_new2_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
-    plt.savefig('clustering/fig_clust3D_mb_new2_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    axes.set_box_aspect([1, 1, 1])
+    plt.title(
+        "Spherical Clustering - n_samples = " + str(m) + ", n_features = " + str(n) + ", n_clusters = " + str(n_clust))
+    #plt.savefig('clustering/fig_clust3D_mc_new22_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    plt.savefig('clustering/fig_clust3D_mb_new22_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    plt.show()
+
+    figure = plt.figure()
+    axes = figure.add_subplot(111, projection='3d')
+    axes.scatter3D(X[:, 0], X[:, 1], X[:, 2], c=y_clust)
+    # Parametrization of the spheres
+    theta = np.linspace(0, 2 * np.pi, 20)
+    phi = np.linspace(0, np.pi, 20)
+    for l in labels:
+        if l != 0:
+            for j, k, c, r in zip(range(len(c_stack)), range(len(r_stack)), c_stack, r_stack):
+                if j == l - 1 and k == l - 1:
+                    x = c[0] + r * np.outer(np.sin(phi), np.cos(theta))
+                    y = c[1] + r * np.outer(np.sin(phi), np.sin(theta))
+                    z = c[2] + r * np.outer(np.cos(phi), np.ones_like(theta))
+                    # 3D graphic
+                    axes.plot_wireframe(x, y, z, color='k', linewidth=0.5)
+                    axes.set_xlabel('x')
+                    axes.set_ylabel('y')
+                    axes.set_zlabel('z')
+    axes.set_xlim(-20, 20)
+    axes.set_ylim(-20, 20)
+    axes.set_zlim(-20, 20)
+    axes.set_box_aspect([1, 1, 1])
+    plt.title("Spherical Clustering - n_samples = " + str(m) + ", n_features = " + str(n) + ", n_clusters = " + str(n_clust))
+    #plt.savefig('clustering/fig2_clust3D_mc_new22_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    plt.savefig('clustering/fig2_clust3D_mb_new22_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
     plt.show()
 
     # i plot hanno tutte le sfere della classificazione binaria 1vsall,
