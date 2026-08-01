@@ -14,10 +14,11 @@ from sklearn.metrics import davies_bouldin_score, silhouette_score
 from Spherical_Clustering_class import Spherical_Clustering
 
 
-m = 30
-n = 2
+m = 40
+n = 3
 
-with open('clustering/dataset_mb_new_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+with open('clustering/dataset_mb_new2_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+#with open('clustering/dataset_mc_new2_' + str(m) + '_' + str(n) + '.txt', 'w') as f:
     f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs - cluster_std=1.4)\n')
     X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=1.4)  # cluster_std=0.8 for perfectly separable clusters
 
@@ -42,7 +43,7 @@ with open('clustering/dataset_mb_new_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
     s_clust.fit(X)
     c_stack = s_clust.c_stack
     r_stack = s_clust.r_stack
-    y_clust = (s_clust.assign_labels(X)).tolist()
+    y_clust = s_clust.assign_labels(X)
     labels = (np.unique(y_clust)).tolist()
 
     if labels[0] != 0:
@@ -93,7 +94,8 @@ for reg, c in zip(regions,colors[1:]):
     axes.scatter(reg,np.zeros(len(reg)), facecolor='none', edgecolor=c)
 if len(outliers) > 0:
     axes.scatter(outliers, np.zeros(len(outliers)), facecolor='none', edgecolor=colors[0])
-plt.savefig('clustering/sw_mb_new_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+plt.savefig('clustering/sw_mb_new2_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+#plt.savefig('clustering/sw_mc_new2_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
 plt.show()
 
 # Graphics
@@ -108,7 +110,8 @@ if n == 2:
     axes.set_ylim(-20, 20)
     axes.set_box_aspect(1)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust2D_mb_new_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    #plt.savefig('clustering/fig_clust2D_mc_new2_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    plt.savefig('clustering/fig_clust2D_mb_new2_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
     plt.show()
 elif n == 3:
     figure = plt.figure()
@@ -131,8 +134,12 @@ elif n == 3:
     axes.set_zlim(-20, 20)
     axes.set_box_aspect([1,1,1])
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust3D_mb_new_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    #plt.savefig('clustering/fig_clust3D_mc_new2_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    plt.savefig('clustering/fig_clust3D_mb_new2_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
     plt.show()
+
+    # i plot hanno tutte le sfere della classificazione binaria 1vsall,
+    # fare (un altro) plot con le sole sfere relative alle etichette finali effettive ottenute con il clustering?
 
 
 

@@ -115,7 +115,7 @@ def spherical_clustering_fit(X,l,d,eps):
 
     # labels for points in R^n
     y_pca = np.zeros(m)
-    labels = range(n_regions+1)
+    labels = list(range(n_regions+1))
     for r_idx,l in zip(regions_idx,labels[1:]):
         for i in r_idx:
             y_pca[i] = l
@@ -178,11 +178,19 @@ def spherical_clustering_fit(X,l,d,eps):
     return labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
 
 def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
-    y = np.zeros(X.shape[0],dtype=np.int8)  # outliers have label 0
+    m = X.shape[0]
+    y = [0]*m  # outliers have label 0
+    dist = [0]*m
     for r,c,l in zip(r_stack,c_stack,labels[1:]):
         for i in range(X.shape[0]):
-            if np.linalg.norm(X[i]-c) <= r:
-                y[i] = l
+            if dist[i] == 0:  # if the point is not yet assigned to a cluster
+                if np.linalg.norm(X[i]-c) <= r:  # if the point is inside the current sphere
+                    dist[i] = np.linalg.norm(X[i]-c)
+                    y[i] = l
+            else:  # if the point is already assigned to a cluster
+                if np.linalg.norm(X[i]-c) <= r and np.linalg.norm(X[i]-c) <= dist[i]:  # if the point is inside the current sphere
+                    dist[i] = np.linalg.norm(X[i]-c)    # we assign it to the sphere with less distance between the point and the center
+                    y[i] = l
 
     return y
 
