@@ -17,12 +17,12 @@ from Spherical_Clustering_class import Spherical_Clustering
 m = 30
 n = 2
 
-with open('clustering/dataset_mc_noout_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
-    #f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs - cluster_std=1.4)\n')
-    #X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=1.4)  # cluster_std=0.8 for perfectly separable clusters
+with open('clustering/dataset_mb_new_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
+    f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_blobs - cluster_std=1.4)\n')
+    X, y = make_blobs(n_samples=m, centers=3, n_features=n, cluster_std=1.4)  # cluster_std=0.8 for perfectly separable clusters
 
-    f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_classification - class_sep=1.3)\n')
-    X, y = make_classification(m, n, n_classes=3, n_clusters_per_class=1, class_sep=1.3, n_informative=n, n_redundant=0, n_repeated=0, random_state=42)
+    #f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ' and n_features=' + str(n) + '\n(make_classification - class_sep=1.3)\n')
+    #X, y = make_classification(m, n, n_classes=3, n_clusters_per_class=1, class_sep=1.3, n_informative=n, n_redundant=0, n_repeated=0)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
@@ -42,26 +42,26 @@ with open('clustering/dataset_mc_noout_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
     s_clust.fit(X)
     c_stack = s_clust.c_stack
     r_stack = s_clust.r_stack
-    y_clust = s_clust.assign_labels(X)
+    y_clust = (s_clust.assign_labels(X)).tolist()
     labels = (np.unique(y_clust)).tolist()
 
-    n_clust = 0
-    for l in labels:
-        if l != 0:
-            n_clust += 1
+    if labels[0] != 0:
+        n_clust = len(labels)
+    else:
+        n_clust = len(labels)-1
 
     n_regions = s_clust.n_regions
     regions = s_clust.regions
     outliers = s_clust.outliers
 
-    X_in_clusters = []
-    X_outliers = []
+    X_in_clusters = []  # list of points in the clusters
+    X_outliers = []  # list of points that are outliers
     for i in range(m):
         if y_clust[i] != 0:
             X_in_clusters.append(X[i])
         else:
             X_outliers.append(X[i])
-    y_clust_no_out = []
+    y_clust_no_out = []  # list of labels of points that are not outliers
     for i in range(m):
         if y_clust[i] != 0:
             y_clust_no_out.append(y_clust[i])
@@ -70,16 +70,21 @@ with open('clustering/dataset_mc_noout_'+str(m)+'_'+str(n)+'.txt', 'w') as f:
     f.write('Radius stack = ' + str(r_stack) + '\n')
     f.write('Number of clusters = ' + str(n_clust) + '\n')
 
-    #DB_index = davies_bouldin_score(X,y_clust)
-    #SC_index = silhouette_score(X,y_clust)
-    #f.write('DB_index = ' + str(DB_index) + '\n')
-    #f.write('SC_index = ' + str(SC_index) + '\n')
-    DB_index = davies_bouldin_score(X_in_clusters, y_clust_no_out)
-    SC_index = silhouette_score(X_in_clusters, y_clust_no_out)
-    f.write('DB_index = ' + str(DB_index) + '(no outliers)\n')
-    f.write('SC_index = ' + str(SC_index) + '(no outliers)\n')
+    # measures of clustering considering all points
+    f.write('Measures of clustering considering all points: \n')
+    DB_index = davies_bouldin_score(X,y_clust)
+    SC_index = silhouette_score(X,y_clust)
+    f.write('DB_index = ' + str(DB_index) + '\n')
+    f.write('SC_index = ' + str(SC_index) + '\n')
+    # measures of clustering considering points without outliers
+    f.write('Measures of clustering considering points without outliers: \n')
+    DB_index1 = davies_bouldin_score(X_in_clusters, y_clust_no_out)
+    SC_index1 = silhouette_score(X_in_clusters, y_clust_no_out)
+    f.write('DB_index = ' + str(DB_index1) + '\n')
+    f.write('SC_index = ' + str(SC_index1) + '\n')
 
-    #f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index, 3)) + ' & ' + str(round(SC_index, 3)) + '\\\\')
+    f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index, 3)) + ' & ' + str(round(SC_index, 3)) + '\\\\ \n')
+    f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index1, 3)) + ' & ' + str(round(SC_index1, 3)) + '\\\\')
 
 # Sliding Window graphic
 figure, axes = plt.subplots()
@@ -88,7 +93,7 @@ for reg, c in zip(regions,colors[1:]):
     axes.scatter(reg,np.zeros(len(reg)), facecolor='none', edgecolor=c)
 if len(outliers) > 0:
     axes.scatter(outliers, np.zeros(len(outliers)), facecolor='none', edgecolor=colors[0])
-plt.savefig('clustering/sw_mc_noout_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
+plt.savefig('clustering/sw_mb_new_' + str(m) + '_' + str(n) + '_' + str(s_clust.n_regions) + '.pdf')
 plt.show()
 
 # Graphics
@@ -101,8 +106,9 @@ if n == 2:
         axes.set_aspect(1)
     axes.set_xlim(-20, 20)
     axes.set_ylim(-20, 20)
+    axes.set_box_aspect(1)
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust2D_mc_noout_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
+    plt.savefig('clustering/fig_clust2D_mb_new_'+str(m)+'_'+str(n)+'_'+str(n_clust)+ '_' +'.pdf')
     plt.show()
 elif n == 3:
     figure = plt.figure()
@@ -125,7 +131,7 @@ elif n == 3:
     axes.set_zlim(-20, 20)
     axes.set_box_aspect([1,1,1])
     plt.title("Spherical Clustering - n_samples = "+str(m)+", n_features = "+str(n)+", n_clusters = "+str(n_clust))
-    plt.savefig('clustering/fig_clust3D_mc_noout_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
+    plt.savefig('clustering/fig_clust3D_mb_new_' + str(m) + '_' + str(n) + '_' + str(n_clust) + '.pdf')
     plt.show()
 
 

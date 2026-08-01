@@ -1,0 +1,14 @@
+Synthetic dataset for clustering with n_samples=30 and n_features=3
+(make_blobs - cluster_std=1.4)
+Best hyperparameters = {'d': 0.2, 'eps': 0.5, 'l': 3}(eps_par = [0.5, 1, 2])
+Centers stack = [array([0., 0., 0.]), array([-1.53831915,  8.09039322,  6.28435493]), array([1.71222374, 7.50804324, 7.32301622]), array([ 6.03342152, -7.54105584,  7.58392198])]
+Radius stack = [np.float64(8.585428511306848), np.float64(0.0898681224315944), np.float64(0.7408575743089978), np.float64(2.16712897611769)]
+Number of clusters = 3
+Measures of clustering considering all points: 
+DB_index = 1.3249004821266022
+SC_index = 0.012720832719312302
+Measures of clustering considering points without outliers: 
+DB_index = 0.1713137943269392
+SC_index = 0.7462552678939622
+30 & 3 & 3 & 1.325 & 0.013\\ 
+30 & 3 & 3 & 0.171 & 0.746\\
