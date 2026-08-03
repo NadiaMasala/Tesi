@@ -49,13 +49,11 @@ for m in n_samples:
                     n_clust = len(labels)-1
 
                 X_no_out = []  # list of points that are not outliers
-                y_no_out = []  # list of original labels of points that are not outliers
                 X_outliers_idx = []  # list of indexes of points that are outliers
                 y_clust_no_out = []  # list of labels of points that are not outliers
                 for i in range(m):
                     if y_clust[i] != 0:
                         X_no_out.append(X[i])
-                        y_no_out.append(y[i]+1)
                         y_clust_no_out.append(y_clust[i])
                     else:
                         X_outliers_idx.append(i)
@@ -72,10 +70,6 @@ for m in n_samples:
                 f.write('DB_index = ' + str(DB_index) + '\n')
                 f.write('SC_index = ' + str(SC_index) + '\n')
 
-                # accuracy score
-                acc = accuracy_score(y_no_out, y_clust_no_out)
-                f.write('Accuracy score = ' + str(acc) + '\n')
-
-                f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index, 3)) + ' & ' + str(round(SC_index, 3)) + ' & ' + str(round(acc, 3)) +'\\\\')
+                f.write(str(m) + ' & ' + str(n) + ' & ' + str(n_clust) + ' & ' + str(round(DB_index, 3)) + ' & ' + str(round(SC_index, 3)) + '\\\\')
 
 
