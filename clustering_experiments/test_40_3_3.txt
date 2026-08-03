@@ -1,0 +1,11 @@
+Synthetic dataset for clustering with n_samples=40, n_features=3, n_centers=3(make_blobs - cluster_std=1.0)
+Best hyperparameters = {'d': 0.2, 'eps': 0.2, 'l': 3}
+
+Results from clustering:Centers stack = [array([-6.20765266, -7.62608337, -6.11740095]), array([0., 0., 0.])]
+Radius stack = [np.float64(1.418654287303382), np.float64(9.116120999214896)]
+Number of clusters = 2
+Number of outliers = 23
+DB_index = 0.12384499927509408
+SC_index = 0.8969778350323379
+Accuracy score = 0.23529411764705882
+40 & 3 & 2 & 0.124 & 0.897 & 0.235\\

@@ -20,7 +20,7 @@ def sliding_window(x,l,d):
         n_iters += 1
         window = x[start:start+l]
 
-        print(window)
+        #print(window)
 
         distances = []  # list of distances between all couples of points in the current window
 
@@ -30,9 +30,9 @@ def sliding_window(x,l,d):
                 break
 
         d_max = max(distances)
-        d_max = round(d_max,5)  # to handle numerical errors due to floating-point representation
+        d_max = round(d_max,6)  # to handle numerical errors due to floating-point representation
 
-        print(d_max)
+        #print(d_max)
 
         if d_max <= d:
             if dense == 0:  # if we are at the first iteration or the previous window was not a dense region
@@ -91,36 +91,35 @@ def spherical_clustering_fit(X,l,d,eps):
 
     X_pca_sorted = sorted(X_pca_list)
 
-    n_regions, regions, outliers, n_iter = sliding_window(X_pca_sorted,l,d)
+    n_regions_sw, regions_sw, outliers_sw, n_iter_sw = sliding_window(X_pca_sorted,l,d)
 
     # clusters of points in R^1
-    regions_idx = [[] for _ in range(n_regions)]
-    outliers_idx = []
+    regions_idx_sw = [[] for _ in range(n_regions_sw)]
+    outliers_idx_sw = []
     for idx in X_pca_list_idx:
         xp = X_pca[idx]
-        for r_idx,reg in zip(regions_idx,regions):
+        for r_idx,reg in zip(regions_idx_sw,regions_sw):
             if xp in reg:
                 r_idx.append(idx)
-        if xp in outliers:
-            outliers_idx.append(idx)
+        if xp in outliers_sw:
+            outliers_idx_sw.append(idx)
 
     if len(X_pca_multi_idx) > 0:
         for idx in X_pca_multi_idx:
             xm = X_pca[idx]
-            for r_idx,reg in zip(regions_idx,regions):
+            for r_idx,reg in zip(regions_idx_sw,regions_sw):
                 if xm in reg:
                     r_idx.append(idx)
-            if xm in outliers:
-                outliers_idx.append(idx)
+            if xm in outliers_sw:
+                outliers_idx_sw.append(idx)
 
     # labels for points in R^n
     y_pca = np.zeros(m)
-    labels = list(range(n_regions+1))
-    for r_idx,l in zip(regions_idx,labels[1:]):
+    labels = list(range(n_regions_sw+1))
+    for r_idx,l in zip(regions_idx_sw,labels[1:]):
         for i in r_idx:
             y_pca[i] = l
-    #for j in outliers_idx:
-    #    y_pca[j] = labels[0]
+    # outliers have label 0
 
     # Multiclass Spherical Classification - 1-vs-all
     y_temp = np.copy(y_pca)
@@ -161,38 +160,41 @@ def spherical_clustering_fit(X,l,d,eps):
         C2_par = list(np.linspace(1e-1, 1e+4, 4))
         center_par = ['fixed', 'free']
         selected_parameters = {'C1': C1_par, 'C2': C2_par, 'center': center_par}
-        sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose=10, n_jobs=10)
+        sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose=0, n_jobs=10)
         sc_grid.fit(X_train, y_train)
         best_params = sc_grid.best_params_
         sc = New_Spherical_Classifier(C1=best_params['C1'], C2=best_params['C2'], center=best_params['center'])
         sc.fit(X_train, y_train)
-        #y_train_pred = sc.predict(X_train)
-        #print('Classification report - Training set - label = ',l)
-        #print(classification_report(y_train, y_train_pred))
-        #y_test_pred = sc.predict(X_test)
-        #print('Classification report - Test set - label = ',l)
-        #print(classification_report(y_test, y_test_pred))
         c_stack.append(sc.c_)
         r_stack.append(sc.r_)
 
-    return labels, r_stack, c_stack, X_pca, n_regions, regions, regions_idx, outliers, outliers_idx, n_iter
+    return labels, r_stack, c_stack, X_pca, n_regions_sw, regions_sw, regions_idx_sw, outliers_sw, outliers_idx_sw, n_iter_sw
+
 
 def spherical_clust_assign_labels(X,labels,r_stack,c_stack):
     m = X.shape[0]
-    y = [0]*m  # outliers have label 0
+    y_clust = [0]*m  # outliers have label 0
     dist = [0]*m
+    r_stack_clust = []
+    c_stack_clust = []
     for r,c,l in zip(r_stack,c_stack,labels[1:]):
         for i in range(X.shape[0]):
-            if dist[i] == 0:  # if the point is not yet assigned to a cluster
+            if dist[i] == 0:  # if the point is not assigned to a cluster
                 if np.linalg.norm(X[i]-c) <= r:  # if the point is inside the current sphere
                     dist[i] = np.linalg.norm(X[i]-c)
-                    y[i] = l
+                    y_clust[i] = l
+                    if (r,c) not in zip(r_stack_clust,c_stack_clust):
+                        r_stack_clust.append(r)
+                        c_stack_clust.append(c)
             else:  # if the point is already assigned to a cluster
                 if np.linalg.norm(X[i]-c) <= r and np.linalg.norm(X[i]-c) <= dist[i]:  # if the point is inside the current sphere
                     dist[i] = np.linalg.norm(X[i]-c)    # we assign it to the sphere with less distance between the point and the center
-                    y[i] = l
+                    y_clust[i] = l
+                    if (r,c) not in zip(r_stack_clust,c_stack_clust):
+                        r_stack_clust.append(r)
+                        c_stack_clust.append(c)
 
-    return y
+    return y_clust, r_stack_clust, c_stack_clust
 
 
 
