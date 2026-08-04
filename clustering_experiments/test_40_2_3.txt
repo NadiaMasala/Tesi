@@ -2,10 +2,10 @@ Synthetic dataset for clustering with n_samples=40, n_features=2, n_centers=3(ma
 Best hyperparameters = {'d': 0.2, 'eps': 0.2, 'l': 3}
 
 Results from clustering:
-Centers stack = [array([-9.0725676 ,  5.34453178]), array([-1.76212355, -5.1007106 ])]
-Radius stack = [np.float64(1.818079776889722), np.float64(6.470919186814064)]
-Number of clusters = 2
+Centers stack = [array([-8.31719964,  3.42480194]), array([-4.9573599 , -9.18055669]), array([-1.66125604, -7.08256069])]
+Radius stack = [np.float64(1.5571627084413184), np.float64(1.0376036708771332), np.float64(3.7032394401447033)]
+Number of clusters = 3
 Number of outliers = 5
-DB_index = 0.4404695758532279
-SC_index = 0.6566593329591427
-40 & 2 & 2 & 0.44 & 0.657\\
+DB_index = 0.4003742316679015
+SC_index = 0.6735128876209268
+40 & 2 & 3 & 0.4 & 0.674\\
