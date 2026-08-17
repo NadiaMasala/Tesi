@@ -64,5 +64,4 @@ colors = cm.rainbow(np.linspace(0,1,n_regions))
 for reg, c in zip(regions,colors):
     axes.scatter(reg,np.zeros(len(reg)), facecolor=c, edgecolor=c)
 axes.scatter(outliers, np.zeros(len(outliers)), facecolor='gray', edgecolor='gray')
-axes.set_xticks(points)
-plt.show()
+plt.savefig('experiments/example_sliding.pdf')

@@ -146,7 +146,7 @@ def spherical_clustering_fit(X,l,d,eps):
         d_max = d_l_max + eps
         for i in range(m):
             if X[i] not in X_l:
-                in_box = 0  # counter for points in the box
+                in_box = 0
                 for j in range(n):
                     if X[i,j] >= C_l[j]-d_max and X[i,j] <= C_l[j]+d_max:
                         in_box += 1
