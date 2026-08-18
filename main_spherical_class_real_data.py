@@ -26,7 +26,7 @@ for d in data_list:
     m = X.shape[0]
     n = X.shape[1]
 
-    with open('experiments/'+d+'.txt', 'w') as f:
+    with open('experiments/'+d+'svm.txt', 'w') as f:
 
         f.write('Dataset "'+d+'":  n_samples = '+str(m)+', n_features = '+str(n)+'\n')
 

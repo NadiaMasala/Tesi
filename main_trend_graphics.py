@@ -11,6 +11,16 @@ from sklearn.metrics import classification_report, accuracy_score
 from Spherical_Class_class import Spherical_Classifier
 from sklearn.svm import SVC
 
+#accuracy_train = [0.988,0.9,1.0,0.9,1.0,0.838,0.8,0.838,0.5,0.956,0.75,0.487]
+#accuracy_test = [1.0,0.9,0.95,0.8,0.975,0.825,0.8,0.9,0.5,0.925,0.775,0.5]
+f1_train = [0.987,0.889,1.0,0.901,1.0,0.86,0.75,0.806,0.0,0.957,0.798,0.655]
+f1_test = [1.0,0.889,0.952,0.8,0.976,0.851,0.75,0.9,0.0,0.919,0.816,0.667]
+#differences = np.abs(np.array(accuracy_train)-np.array(accuracy_test))
+differences = np.abs(np.array(f1_train)-np.array(f1_test))
+max_diff = np.max(differences)
+print(differences)
+print(round(max_diff,3))
+quit()
 
 #n_samples = [150]*7 + [200]*7 + [300]*8
 n_features = [2]*3 + [5]*3 + [10] + [2]*3 + [5]*2 + [10]*2 + [2]*3 + [5]*3 + [10]*2
