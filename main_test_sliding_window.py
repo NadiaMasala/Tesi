@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import matplotlib.cm as cm
 from Helper_Spherical_Clustering import *
 
@@ -8,6 +9,29 @@ points = [0,0.06,0.12,0.25,0.5,1,1.62,1.75,1.87,1.93,2]  # (d = 0.2)
 #points = [-4.8,-4.7,-4.62,-4.55,-1,-0.2,1.5,1.62,1.78,4.9]  # (d = 0.3)
 #points = [0,0.06,0.12,0.12,0.25,0.5,0.5,1,1.62,1.75,1.87,1.87,1.93,2]  # (d = 0.2) with double points
 #points = [-4.8,-4.7,-4.62,-4.62,-4.55,-1,-1,-1,-0.2,1.5,1.62,1.62,1.62,1.78,4.9]  # (d = 0.3) with double and triple points
+
+region = [0,0.06,0.12,0.25]
+region2 = [1.62,1.75,1.87,1.93,2]
+#window = [1.87,1.93,2]
+rest = [0.5,1]
+#xmin = min(window) - 0.03
+#xmax = max(window) + 0.03
+#ymin = -0.03
+#ymax = 0.03
+#a = xmax - xmin
+#b = ymax - ymin
+#rectangle = patches.Rectangle((xmin,ymin),a,b,fill=False,edgecolor='black')
+figure, axes = plt.subplots()
+#axes.scatter(points, np.zeros(len(points)), facecolor='gray', edgecolor='gray')
+axes.scatter(region, np.zeros(len(region)), facecolor='red', edgecolor='red')
+axes.scatter(region2, np.zeros(len(region2)), facecolor='blue', edgecolor='blue')
+axes.scatter(rest, np.zeros(len(rest)), facecolor='gray', edgecolor='gray')
+#plt.gca().add_patch(rectangle)
+plt.axis('equal')
+plt.savefig('experiments/example_sliding.pdf')
+
+quit()
+
 l = 3
 d = 0.2
 #d = 0.3
