@@ -1,0 +1,2 @@
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(10000.0)}
+Class in = A, label in = 0

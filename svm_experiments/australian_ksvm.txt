@@ -1,0 +1,23 @@
+Dataset "australian":  n_samples = 690, n_features = 14
+Best hyperparameter = {'C': np.float64(0.1)}
+kSVM - Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.93      0.78      0.85       306
+         1.0       0.77      0.93      0.85       246
+
+    accuracy                           0.85       552
+   macro avg       0.85      0.86      0.85       552
+weighted avg       0.86      0.85      0.85       552
+
+kSVM - Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.93      0.87      0.90        77
+         1.0       0.85      0.92      0.88        61
+
+    accuracy                           0.89       138
+   macro avg       0.89      0.89      0.89       138
+weighted avg       0.89      0.89      0.89       138
+
+ & 0.891 & 0.882\\

@@ -1,0 +1,23 @@
+Dataset "HillValley_training":  n_samples = 606, n_features = 100
+Best hyperparameter = {'C': np.float64(10000.0)}
+kSVM - Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.70      0.99      0.82       244
+         1.0       0.98      0.57      0.72       240
+
+    accuracy                           0.78       484
+   macro avg       0.84      0.78      0.77       484
+weighted avg       0.84      0.78      0.77       484
+
+kSVM - Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.62      0.95      0.75        61
+         1.0       0.90      0.43      0.58        61
+
+    accuracy                           0.69       122
+   macro avg       0.76      0.69      0.67       122
+weighted avg       0.76      0.69      0.67       122
+
+ & 0.689 & 0.578\\

@@ -1,0 +1,23 @@
+Dataset "breast_wisconsin":  n_samples = 569, n_features = 29
+Best hyperparameter = {'C': np.float64(0.1)}
+kSVM - Classification report - Training set 
+              precision    recall  f1-score   support
+
+         0.0       0.99      0.94      0.97       170
+         1.0       0.97      1.00      0.98       285
+
+    accuracy                           0.98       455
+   macro avg       0.98      0.97      0.97       455
+weighted avg       0.98      0.98      0.98       455
+
+kSVM - Classification report - Test set 
+              precision    recall  f1-score   support
+
+         0.0       0.98      0.95      0.96        42
+         1.0       0.97      0.99      0.98        72
+
+    accuracy                           0.97       114
+   macro avg       0.97      0.97      0.97       114
+weighted avg       0.97      0.97      0.97       114
+
+ & 0.974 & 0.979\\
