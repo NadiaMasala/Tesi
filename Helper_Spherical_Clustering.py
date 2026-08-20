@@ -20,7 +20,7 @@ def sliding_window(x,l,d):
         n_iters += 1
         window = x[start:start+l]
 
-        print(window)
+        #print(window)
 
         distances = []  # list of distances between all couples of points in the current window
 
@@ -32,7 +32,7 @@ def sliding_window(x,l,d):
         d_max = max(distances)
         d_max = round(d_max,6)  # to handle numerical errors due to floating-point representation
 
-        print(d_max)
+        #print(d_max)
 
         if d_max <= d:
             if dense == 0:  # if we are at the first iteration or the previous window was not a dense region

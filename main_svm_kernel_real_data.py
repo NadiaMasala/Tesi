@@ -30,7 +30,7 @@ for d in data_list:
     m = X.shape[0]
     n = X.shape[1]
 
-    with open('experiments/'+d+'_ksvm.txt', 'w') as f:
+    with open('svm_experiments/'+d+'_ksvm.txt', 'w') as f:
 
         f.write('Dataset "'+d+'":  n_samples = '+str(m)+', n_features = '+str(n)+'\n')
 
@@ -54,9 +54,12 @@ for d in data_list:
 
         acc_test = accuracy_score(y_test, y_test_pred)
         f1_test = f1_score(y_test, y_test_pred)
-        acc.append(acc_test)
-        f1.append(f1_test)
+        acc.append(round(acc_test,3))
+        f1.append(round(f1_test,3))
         f.write(' & '+str(round(acc_test,3))+' & '+str(round(f1_test,3))+'\\\\')
 
 print('acc = '+str(acc))
 print('f1 = '+str(f1))
+
+#acc = [0.621, 0.767, 0.778, 0.815, 0.799, 0.993, 1.0, 0.891, 1.0, 0.828, 0.905, 0.974, 0.7, 0.9, 0.689]
+#f1 = [0.353, 0.103, 0.6, 0.783, 0.858, 0.99, 1.0, 0.882, 1.0, 0.831, 0.9, 0.979, 0.0, 0.0, 0.578]
