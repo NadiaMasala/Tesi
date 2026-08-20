@@ -28,7 +28,7 @@ for m in n_samples:
                 f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ', n_features=' + str(n) + ', n_centers=' + str(nc) + ' (make_blobs - cluster_std=1.0)\n\n')
 
 
-                X, y = make_blobs(n_samples=m, centers=nc, n_features=n, cluster_std=1.0)
+                X, y = make_blobs(n_samples=m, centers=nc, n_features=n, cluster_std=1.0,random_state=42)
                 # Selection of values of hyperparameters by Grid Search
                 l_par = [3, 4, 5, 7]
                 d_par = [0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5]
