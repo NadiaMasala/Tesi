@@ -15,7 +15,7 @@ from New_Spherical_Class_class import New_Spherical_Classifier
 from New_Helper_SC import *
 from sklearn.metrics import accuracy_score, f1_score
 
-
+'''
 acc = []
 f1 = []
 data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','Fertility','HillValley_training']
@@ -60,6 +60,32 @@ for d in data_list:
 
 print('acc = '+str(acc))
 print('f1 = '+str(f1))
+'''
 
-#acc = [0.621, 0.767, 0.778, 0.815, 0.799, 0.993, 1.0, 0.891, 1.0, 0.828, 0.905, 0.974, 0.7, 0.9, 0.689]
-#f1 = [0.353, 0.103, 0.6, 0.783, 0.858, 0.99, 1.0, 0.882, 1.0, 0.831, 0.9, 0.979, 0.0, 0.0, 0.578]
+data_list = ['liver','blood_transfusion','flowmeters','heart','diabetes','breast','divorce','australian','Mesothelioma','Gallstone','sonar','breast_wisconsin','germannumer','Fertility'] #'HillValley_training'
+acc = [0.621,0.7,0.444,0.556,0.714,0.92,1.0,0.732,0.708,0.578,0.524,0.877,0.7,0.9]
+f1 = [0.154,0.118,0.167,0.0,0.796,0.871,1.0,0.755,0.829,0.597,0.63,0.91,0.0,0.0]
+acc_ksvm = [0.621, 0.767, 0.778, 0.815, 0.799, 0.993, 1.0, 0.891, 1.0, 0.828, 0.905, 0.974, 0.7, 0.9] #HillValley_training = 0.689
+f1_ksvm = [0.353, 0.103, 0.6, 0.783, 0.858, 0.99, 1.0, 0.882, 1.0, 0.831, 0.9, 0.979, 0.0, 0.0] #HillValley_training = 0.578
+
+plt.figure()
+sc_acc = plt.plot(data_list, acc, marker='o', color='red', label='Spherical Classifier')
+ksvm_acc = plt.plot(data_list, acc_ksvm, marker='o', color='blue', label='Kernel SVM')
+plt.xticks(range(len(data_list)),data_list,rotation=90)
+plt.ylim(-0.1, 1.1)
+plt.xlabel('datasets')
+plt.ylabel('accuracy')
+plt.legend()
+plt.tight_layout()
+plt.savefig('svm_experiments/accuracy_sc_vs_ksvm.pdf')
+
+plt.figure()
+sc_f1 = plt.plot(data_list, f1, marker='o', color='red', label='Spherical Classifier')
+ksvm_f1 = plt.plot(data_list, f1_ksvm, marker='o', color='blue', label='Kernel SVM')
+plt.xticks(range(len(data_list)),data_list,rotation=90)
+plt.ylim(-0.1, 1.1)
+plt.xlabel('datasets')
+plt.ylabel('F1-score')
+plt.legend()
+plt.tight_layout()
+plt.savefig('svm_experiments/f1_sc_vs_ksvm.pdf')
