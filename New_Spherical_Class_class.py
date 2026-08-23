@@ -31,7 +31,6 @@ class New_Spherical_Classifier( BaseEstimator , ClassifierMixin ) :
             self.in_label_ = in_label
             self.out_label_ = out_label
         elif self.center == 'free':
-            #r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_mosek(self.X_,self.y_,self.C1,self.C2,self.epsilon,self.minpts)
             r, c, xi_in, xi_out, in_class, out_class, in_label, out_label = spherical_class_fit_semidef2_T_mosek(self.X_,self.y_,self.C1,self.C2,self.epsilon,self.minpts)
             self.r_ = r
             self.c_ = c

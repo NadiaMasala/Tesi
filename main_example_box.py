@@ -24,6 +24,11 @@ with open('clustering_experiments/new_example_box_' + str(m) + '_' + str(n) + '_
     f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ', n_features=' + str(n) + ', n_centers=' + str(nc) + ' (make_blobs - cluster_std=1.0)\n\n')
 
     X, y = make_blobs(n_samples=m, centers=nc, n_features=n, cluster_std=1.0, random_state=40)
+
+    plt.figure()
+    plt.scatter(X[:,0],X[:,1],facecolor='None', edgecolor='black')
+    plt.savefig('clustering_experiments/new_points_box.pdf')
+
     # Selection of values of hyperparameters by Grid Search
     l_par = [3, 4, 5, 7]
     d_par = [0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5]
@@ -131,15 +136,33 @@ for r_idx,l in zip(sph_clst.regions_idx,labels[1:]):
 figure, axes = plt.subplots()
 for l,col in zip(labels[1:],colors):
     X_l = []
-#    X_no_l = []
+    for i in range(m):
+        if y_pca[i] == l:
+            X_l.append(X[i])
+    X_l = np.array(X_l)
+    axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
+X_out = []
+for i in range(m):
+    if y_pca[i] == 0:
+        X_out.append(X[i])
+if len(X_out) > 0:
+    X_out = np.array(X_out)
+    axes.scatter(X_out[:, 0], X_out[:, 1], facecolor='None', edgecolor='gray')
+plt.xlim(-8.0,12.7)
+plt.ylim(-12.1,3)
+plt.savefig('clustering_experiments/new_example_pre_box_tot.pdf')
+
+for l,col in zip(labels[1:],colors):
+    X_l = []
+    X_no_l = []
     C_l = np.zeros(n)
     for i in range(m):
         if y_pca[i] == l:
             X_l.append(X[i])
-#        else:
-#            X_no_l.append(X[i])
+        else:
+            X_no_l.append(X[i])
     X_l = np.array(X_l)
-#    X_no_l = np.array(X_no_l)
+    X_no_l = np.array(X_no_l)
     for i in range(X_l.shape[0]):
         for j in range(n):
             C_l[j] = np.mean(X_l[:,j])
@@ -151,14 +174,74 @@ for l,col in zip(labels[1:],colors):
     edge = 2*d_max
     xmin = C_l[0]-d_max
     ymin = C_l[1]-d_max
-#    figure, axes = plt.subplots()
+    figure, axes = plt.subplots()
     rectangle = patches.Rectangle((xmin,ymin),edge,edge,fill=False,edgecolor='black')
-#    axes.scatter(X_no_l[:, 0], X_no_l[:, 1], facecolor='None', edgecolor='gray')
+    axes.scatter(X_no_l[:, 0], X_no_l[:, 1], facecolor='None', edgecolor='black')
     axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
     axes.add_patch(rectangle)
-#    plt.xlim(-8.0,12.7)
-#    plt.ylim(-12.1,3)
-#    plt.savefig('clustering_experiments/new_example_box_'+str(l)+'.pdf')
+    plt.xlim(-8.0,12.7)
+    plt.ylim(-12.1,3)
+    plt.savefig('clustering_experiments/new_example_box_'+str(l)+'.pdf')
+
+for l,col in zip(labels[1:],colors):
+    X_l = []
+    X_no_l = []
+    C_l = np.zeros(n)
+    for i in range(m):
+        if y_pca[i] == l:
+            X_l.append(X[i])
+        else:
+            X_no_l.append(X[i])
+    X_l = np.array(X_l)
+    X_no_l = np.array(X_no_l)
+    for i in range(X_l.shape[0]):
+        for j in range(n):
+            C_l[j] = np.mean(X_l[:,j])
+    distances_l = {}
+    for i in range(X_l.shape[0]):
+        distances_l[i] = np.linalg.norm(C_l - X_l[i])
+    d_l_max = max(distances_l.values())
+    d_max = d_l_max + best_params['eps']
+    for i in range(m):
+        if X[i] not in X_l:
+            in_box = 0
+            for j in range(n):
+                if X[i, j] >= C_l[j] - d_max and X[i, j] <= C_l[j] + d_max:
+                    in_box += 1
+            if in_box == n:  # X[i] is inside the box
+                X_l = np.append(X_l, X[i].reshape((1, n)), axis=0)  # we add X[i] to the class with label l
+    edge = 2*d_max
+    xmin = C_l[0]-d_max
+    ymin = C_l[1]-d_max
+    figure, axes = plt.subplots()
+    axes.scatter(X_no_l[:, 0], X_no_l[:, 1], facecolor='None', edgecolor='black')
+    axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
+    plt.xlim(-8.0,12.7)
+    plt.ylim(-12.1,3)
+    plt.savefig('clustering_experiments/new_example_bin_data_'+str(l)+'.pdf')
+
+figure, axes = plt.subplots()
+for l,col in zip(labels[1:],colors):
+    X_l = []
+    C_l = np.zeros(n)
+    for i in range(m):
+        if y_pca[i] == l:
+            X_l.append(X[i])
+    X_l = np.array(X_l)
+    for i in range(X_l.shape[0]):
+        for j in range(n):
+            C_l[j] = np.mean(X_l[:,j])
+    distances_l = {}
+    for i in range(X_l.shape[0]):
+        distances_l[i] = np.linalg.norm(C_l - X_l[i])
+    d_l_max = max(distances_l.values())
+    d_max = d_l_max + best_params['eps']
+    edge = 2*d_max
+    xmin = C_l[0]-d_max
+    ymin = C_l[1]-d_max
+    rectangle = patches.Rectangle((xmin,ymin),edge,edge,fill=False,edgecolor='black')
+    axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
+    axes.add_patch(rectangle)
 X_out = []
 for i in range(m):
     if y_pca[i] == 0:
@@ -170,4 +253,53 @@ plt.xlim(-8.0,12.7)
 plt.ylim(-12.1,3)
 plt.savefig('clustering_experiments/new_example_box_tot.pdf')
 
-#scrivere codice anche se ripetitivo di passaggi in modo che dia sempre lo stesso risultato tutto in un solo lancio
+clst_labels = np.unique(y_clust)
+if clst_labels[0] == 0:
+    figure, axes = plt.subplots()
+    for l, col in zip(clst_labels[1:], colors):
+        X_l = []
+        for i in range(m):
+            if y_clust[i] == l:
+                X_l.append(X[i])
+        X_l = np.array(X_l)
+        axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
+    X_out = []
+    for i in range(m):
+        if y_clust[i] == 0:
+            X_out.append(X[i])
+    if len(X_out) > 0:
+        X_out = np.array(X_out)
+        axes.scatter(X_out[:, 0], X_out[:, 1], facecolor='None', edgecolor='gray')
+    for c, r in zip(c_stack_clust, r_stack_clust):
+        circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
+        axes.add_artist(circle)
+        axes.set_aspect(1)
+    plt.xlim(-8.0, 12.7)
+    plt.ylim(-12.1, 3)
+    plt.savefig('clustering_experiments/new_example_clst_tot.pdf')
+else:
+    figure, axes = plt.subplots()
+    for l, col in zip(clst_labels, colors):
+        X_l = []
+        for i in range(m):
+            if y_clust[i] == l:
+                X_l.append(X[i])
+        X_l = np.array(X_l)
+        axes.scatter(X_l[:, 0], X_l[:, 1], facecolor='None', edgecolor=col)
+    X_out = []
+    for i in range(m):
+        if y_clust[i] == 0:
+            X_out.append(X[i])
+    if len(X_out) > 0:
+        X_out = np.array(X_out)
+        axes.scatter(X_out[:, 0], X_out[:, 1], facecolor='None', edgecolor='gray')
+    for c, r in zip(c_stack_clust, r_stack_clust):
+        circle = plt.Circle((c[0], c[1]), r, color='black', fill=False)
+        axes.add_artist(circle)
+        axes.set_aspect(1)
+    plt.xlim(-8.0, 12.7)
+    plt.ylim(-12.1, 3)
+    plt.savefig('clustering_experiments/new_example_clst_tot.pdf')
+
+
+

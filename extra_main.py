@@ -211,3 +211,20 @@ elif n == 3:
     axes.set_box_aspect([1, 1, 1])
     plt.title("Spherical Clustering - n_samples = " + str(m) + ", n_features = " + str(n) + ", n_clusters = " + str(n_clust))
     plt.show()
+
+    '''
+        f.write('Optimal center = '+ str(sc.c_) + '\n')
+        y_train_pred = sc.predict(X_train)
+        f.write('Classification report - Training set \n')
+        f.write(classification_report(y_train, y_train_pred) + '\n')
+        y_test_pred = sc.predict(X_test)
+        f.write('Classification report - Test set \n')
+        f.write(classification_report(y_test, y_test_pred) + '\n')
+        acc_train = accuracy_score(y_train, y_train_pred)
+        acc_test = accuracy_score(y_test, y_test_pred)
+        acc_tot = accuracy_score(y, sc.predict(X))
+        f1_train = f1_score(y_train, y_train_pred)
+        f1_test = f1_score(y_test, y_test_pred)
+        f1_tot = f1_score(y, sc.predict(X))
+        f.write(str(ns)+ '&' +str(nf)+ '&' +str(round(acc_train,3))+ '&' +str(round(f1_train,3))+ '&' +str(round(acc_test,3))+ '&' +str(round(f1_test,3))+ '&' +str(round(acc_tot,3))+ '&' +str(round(f1_tot,3))+ '\\\\')
+    '''

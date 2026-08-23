@@ -1,11 +1,11 @@
 Synthetic dataset for clustering with n_samples=50, n_features=2, n_centers=3 (make_blobs - cluster_std=1.0)
 
-Best hyperparameters = {'l': 3, 'd': 0.2, 'eps': 0.5}
+Best hyperparameters = {'l': 3, 'd': 0.2, 'eps': 0.3}
 
 Results from clustering:
-Centers stack = [array([-2.21245526, -8.62694951]), array([ 1.06112892, -6.17338697]), array([ 3.05192195, -5.79986404])]
-Radius stack = [np.float64(1.444421332547388), np.float64(5.5737101209307784), np.float64(4.590472767962784)]
+Centers stack = [array([-1.60064542, -8.54060096]), array([ 1.061203 , -6.1738149]), array([ 3.4870055 , -6.10885209])]
+Radius stack = [np.float64(2.0538001487734308), np.float64(5.57431040963648), np.float64(4.600160848043733)]
 Number of clusters = 3
-Number of outliers = 2
-DB_index = 0.7133595033899137
-SC_index = 0.5058635965750525
+Number of outliers = 1
+DB_index = 0.4570214681338334
+SC_index = 0.6776378904235125
