@@ -1,1 +1,2 @@
-Best hyperparameters = {'C1': np.float64(0.1), 'C2': np.float64(0.1), 'center': 'fixed', 'epsilon': np.float64(1.2235305797882374), 'minpts': 5}
+Best hyperparameters = {'C1': np.float64(3333.3999999999996), 'C2': np.float64(0.1), 'center': 'free', 'epsilon': np.float64(1.1111237431109862), 'minpts': 5}
+Class in = A, label in = 0

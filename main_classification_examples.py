@@ -16,90 +16,90 @@ from sklearn.metrics import accuracy_score, f1_score
 ns = 50
 nf = 2
 
-#with open('experiments/dense_class_sel_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
+with open('experiments/dense_class_sel_'+str(ns)+'_'+str(nf)+'.txt', 'w') as f:
 
-X, y = make_blobs(n_samples=ns, centers=2, n_features=nf, cluster_std=1.3, random_state=42)
-#ns_in = math.floor(0.5*ns)
-#ns_out = math.floor(0.25*ns)
-#X_in = 2*np.random.random_sample((ns_in,nf))-1
-#y_in = np.zeros(ns_in)
-#X_out = np.random.random_sample((ns_out,nf))-2
-#X_out = np.append(X_out, np.random.random_sample((ns_out,nf))+1, axis=0)
-#y_out = np.ones(2*ns_out)
-#X = np.append(X_in,X_out,axis=0)
-#y = np.append(y_in,y_out,axis=0)
+    X, y = make_blobs(n_samples=ns, centers=2, center_box=(-3,3), n_features=nf, cluster_std=0.6)
+    #ns_in = math.floor(0.5*ns)
+    #ns_out = math.floor(0.25*ns)
+    #X_in = 2*np.random.random_sample((ns_in,nf))-1
+    #y_in = np.zeros(ns_in)
+    #X_out = np.random.random_sample((ns_out,nf))-2
+    #X_out = np.append(X_out, np.random.random_sample((ns_out,nf))+1, axis=0)
+    #y_out = np.ones(2*ns_out)
+    #X = np.append(X_in,X_out,axis=0)
+    #y = np.append(y_in,y_out,axis=0)
 
-m = X.shape[0]
-n = X.shape[1]
+    m = X.shape[0]
+    n = X.shape[1]
 
-labels = np.unique(y)
+    labels = np.unique(y)
 
-# Splitting the points by their labels
-A = []
-B = []
-for i in range(m):
-    if y[i] == labels[0]:
-        A.append(X[i])
-    elif y[i] == labels[1]:
-        B.append(X[i])
-A = np.array(A)
-B = np.array(B)
+    # Splitting the points by their labels
+    A = []
+    B = []
+    for i in range(m):
+        if y[i] == labels[0]:
+            A.append(X[i])
+        elif y[i] == labels[1]:
+            B.append(X[i])
+    A = np.array(A)
+    B = np.array(B)
 
-# Splitting the dataset in training set e test set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # Splitting the dataset in training set e test set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-# Splitting training classes by their labels
-A_train = []
-B_train = []
-for i in range(X_train.shape[0]):
-    if y_train[i] == labels[0]:
-        A_train.append(X_train[i])
-    elif y_train[i] == labels[1]:
-        B_train.append(X_train[i])
-A_train = np.array(A_train)
-B_train = np.array(B_train)
+    # Splitting training classes by their labels
+    A_train = []
+    B_train = []
+    for i in range(X_train.shape[0]):
+        if y_train[i] == labels[0]:
+            A_train.append(X_train[i])
+        elif y_train[i] == labels[1]:
+            B_train.append(X_train[i])
+    A_train = np.array(A_train)
+    B_train = np.array(B_train)
 
-# Defining training classes centroids
-cA_train = np.zeros(A_train.shape[1])
-cB_train = np.zeros(B_train.shape[1])
-for j in range(X_train.shape[1]):
-    cA_train[j] = np.mean(A_train[:, j])
-    cB_train[j] = np.mean(B_train[:, j])
+    # Defining training classes centroids
+    cA_train = np.zeros(A_train.shape[1])
+    cB_train = np.zeros(B_train.shape[1])
+    for j in range(X_train.shape[1]):
+        cA_train[j] = np.mean(A_train[:, j])
+        cB_train[j] = np.mean(B_train[:, j])
 
-dA_train = {}
-for i in range(A_train.shape[0]):
-    dA_train[i] = np.linalg.norm(cA_train - A_train[i])
-dB_train = {}
-for j in range(B_train.shape[0]):
-    dB_train[j] = np.linalg.norm(cB_train - B_train[j])
+    dA_train = {}
+    for i in range(A_train.shape[0]):
+        dA_train[i] = np.linalg.norm(cA_train - A_train[i])
+    dB_train = {}
+    for j in range(B_train.shape[0]):
+        dB_train[j] = np.linalg.norm(cB_train - B_train[j])
 
-dA_min = min(dA_train.values())
-dA_max = max(dA_train.values())
-dB_min = min(dB_train.values())
-dB_max = max(dB_train.values())
-d_min = max(dA_min, dB_min)
-d_max = min(dA_max, dB_max)
+    dA_min = min(dA_train.values())
+    dA_max = max(dA_train.values())
+    dB_min = min(dB_train.values())
+    dB_max = max(dB_train.values())
+    d_min = max(dA_min, dB_min)
+    d_max = min(dA_max, dB_max)
 
-# Selection of values of hyperparameters by Grid Search
-epsilon_par = list(np.linspace(d_min,d_max,5))
-minpts_par = [5, 10, 15]
-C1_par = list(np.linspace(1e-1, 1e+4, 4))
-C2_par = list(np.linspace(1e-1, 1e+4, 4))
-center_par = ['fixed','free']
-selected_parameters = {'epsilon':epsilon_par, 'minpts':minpts_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
-sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
-sc_grid.fit(X_train, y_train)
-best_params = sc_grid.best_params_
-print('Best hyperparameters = '+ str(best_params) + '\n')
+    # Selection of values of hyperparameters by Grid Search
+    epsilon_par = list(np.linspace(d_min,d_max,5))
+    minpts_par = [5, 10, 15]
+    C1_par = list(np.linspace(1e-1, 1e+4, 4))
+    C2_par = list(np.linspace(1e-1, 1e+4, 4))
+    center_par = ['fixed','free']
+    selected_parameters = {'epsilon':epsilon_par, 'minpts':minpts_par, 'C1':C1_par, 'C2':C2_par, 'center':center_par}
+    sc_grid = GridSearchCV(New_Spherical_Classifier(), selected_parameters, cv=5, verbose = 10, n_jobs = 10)
+    sc_grid.fit(X_train, y_train)
+    best_params = sc_grid.best_params_
+    f.write('Best hyperparameters = '+ str(best_params) + '\n')
 
-# Spherical Classification
-sc = New_Spherical_Classifier(C1 = best_params['C1'], C2 = best_params['C2'], center = center_par, epsilon = best_params['epsilon'], minpts = best_params['minpts'])
-sc.fit(X_train, y_train)
+    # Spherical Classification
+    sc = New_Spherical_Classifier(C1 = best_params['C1'], C2 = best_params['C2'], center = best_params['center'], epsilon = best_params['epsilon'], minpts = best_params['minpts'])
+    sc.fit(X_train, y_train)
 
-if sc.in_label_ == labels[0]:
-    print('Class in = A, label in = ' +str(sc.in_label_)+ '\n')
-elif sc.in_label_ == labels[1]:
-    print('Class in = B, label in = ' +str(sc.in_label_)+ ' \n')
+    if sc.in_label_ == labels[0]:
+        f.write('Class in = A, label in = ' +str(sc.in_label_)+ '\n')
+    elif sc.in_label_ == labels[1]:
+        f.write('Class in = B, label in = ' +str(sc.in_label_)+ ' \n')
 
 # Graphics
 if nf == 2:
