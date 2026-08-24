@@ -21,9 +21,8 @@ differences = np.abs(np.array(f1_train)-np.array(f1_test))
 max_diff = np.max(differences)
 print(differences)
 print(round(max_diff,3))
-quit()
 '''
-
+'''
 n_samples = [150]*7 + [200]*7 + [300]*8
 n_features = [2]*3 + [5]*3 + [10] + [2]*3 + [5]*2 + [10]*2 + [2]*3 + [5]*3 + [10]*2
 
@@ -51,3 +50,57 @@ plt.xlabel('n. features')
 plt.legend()
 plt.tight_layout()
 plt.savefig('clustering_experiments/features_clustering.pdf')
+'''
+
+#n_samples = [100]*3 + [200]*3
+n_features = [2,2,10,10,40,40]
+
+
+#acc_mb = [1.0,0.9,0.95,0.8,0.975,0.825]
+#acc_mc = [0.8,0.9,0.5,0.925,0.775,0.5]
+#f1_mb = [1.0,0.889,0.952,0.8,0.976,0.851]
+#f1_mc = [0.75,0.9,0.0,0.919,0.816,0.667]
+acc_mb = [1.0,0.8,0.9,0.975,0.95,0.825]
+acc_mc = [0.8,0.925,0.9,0.775,0.5,0.5]
+f1_mb = [1.0,0.8,0.889,0.976,0.952,0.851]
+f1_mc = [0.75,0.919,0.9,0.816,0.0,0.667]
+
+#plt.figure()
+#plt.plot(range(len(n_samples)), acc_mb, marker='o', color='red', label='make_blobs')
+#plt.plot(range(len(n_samples)), acc_mc, marker='o', color='blue', label='make_classification')
+#plt.xticks(range(len(n_samples)),n_samples,rotation=45)
+#plt.xlabel('n. samples')
+#plt.ylabel('accuracy')
+#plt.legend()
+#plt.tight_layout()
+#plt.savefig('experiments/samples_accuracy.pdf')
+
+plt.figure()
+plt.plot(range(len(n_features)), acc_mb, marker='o', color='red', label='make_blobs')
+plt.plot(range(len(n_features)), acc_mc, marker='o', color='blue', label='make_classification')
+plt.xticks(range(len(n_features)),n_features,rotation=45)
+plt.xlabel('n. features')
+plt.ylabel('accuracy')
+plt.legend()
+plt.tight_layout()
+plt.savefig('experiments/features_accuracy.pdf')
+
+#plt.figure()
+#plt.plot(range(len(n_samples)), f1_mb, marker='o', color='red', label='make_blobs')
+#plt.plot(range(len(n_samples)), f1_mc, marker='o', color='blue', label='make_classification')
+#plt.xticks(range(len(n_samples)),n_samples,rotation=45)
+#plt.xlabel('n. samples')
+#plt.ylabel('F1-score')
+#plt.legend()
+#plt.tight_layout()
+#plt.savefig('experiments/samples_f1.pdf')
+
+plt.figure()
+plt.plot(range(len(n_features)), f1_mb, marker='o', color='red', label='make_blobs')
+plt.plot(range(len(n_features)), f1_mc, marker='o', color='blue', label='make_classification')
+plt.xticks(range(len(n_features)),n_features,rotation=45)
+plt.xlabel('n. features')
+plt.ylabel('F1-score')
+plt.legend()
+plt.tight_layout()
+plt.savefig('experiments/features_f1.pdf')
