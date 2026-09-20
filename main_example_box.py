@@ -27,7 +27,11 @@ with open('clustering_experiments/new_example_box_' + str(m) + '_' + str(n) + '_
 
     plt.figure()
     plt.scatter(X[:,0],X[:,1],facecolor='None', edgecolor='black')
-    plt.savefig('clustering_experiments/new_points_box.pdf')
+    plt.xlim(-8.0, 12.7)
+    plt.ylim(-12.1, 3)
+    plt.savefig('clustering_experiments/new_new_points_box.pdf')
+
+    quit()
 
     # Selection of values of hyperparameters by Grid Search
     l_par = [3, 4, 5, 7]

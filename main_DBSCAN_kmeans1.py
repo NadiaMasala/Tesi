@@ -23,12 +23,12 @@ n_centers = [3,5,7]
 for m in n_samples:
     for n in n_features:
         for nc in n_centers:
-            with open('clustering_experiments/dataset_db_km_'+str(m)+'_'+str(n)+'_'+str(nc)+'.txt', 'w') as f:
+            with open('clustering_experiments/new1_dataset_db_km_'+str(m)+'_'+str(n)+'_'+str(nc)+'.txt', 'w') as f:
                 f.write('Synthetic dataset for clustering with n_samples=' + str(m) + ', n_features=' + str(n) + ', n_centers=' + str(nc) + ' (make_blobs - cluster_std=1.0)\n\n')
 
                 X, y = make_blobs(n_samples=m, centers=nc, n_features=n, cluster_std=1.0,random_state=42)
 
-                kmeans = KMeans(n_clusters=nc)
+                kmeans = KMeans(n_clusters=nc, random_state=42)
                 kmeans.fit(X)
                 y_km = kmeans.labels_
 
@@ -80,8 +80,8 @@ for m in n_samples:
                             else:
                                 X_outliers_idx.append(i)
 
-                        DB_db = davies_bouldin_score(X, y_db_no_out)
-                        SC_db = silhouette_score(X, y_db_no_out)
+                        DB_db = davies_bouldin_score(X_no_out, y_db_no_out)
+                        SC_db = silhouette_score(X_no_out, y_db_no_out)
 
                         # Mapping the scores to [0,1] to compute their average
                         SC_db_scaled = (SC_db + 1) / 2
@@ -92,14 +92,18 @@ for m in n_samples:
                         if Avg_score > best_score_db:
                             best_params = {'eps': eps,'minpts':minpts}
                             best_score_db = Avg_score
+                            DB = DB_db
+                            SC = SC_db
+                            n_clust = n_clst_db
+                            n_out = len(X_outliers_idx)
                     except:
                         continue
 
-                #qui dovrei riinizializzare DBSCAN o i risultati sono salvati (non mi sembra)?
-
                 f.write('Results from DBSCAN:\n')
-                f.write('Number of clusters = ' + str(n_clst_db) + '\n')
-                f.write('DB_index = ' + str(DB_db) + '\n')
-                f.write('SC_index = ' + str(SC_db) + '\n')
+                f.write('Best hyperparameters = ' + str(best_params) + '\n\n')
+                f.write('Number of clusters = ' + str(n_clust) + '\n')
+                f.write('Number of outliers = ' + str(n_out) + '\n')
+                f.write('DB_index = ' + str(DB) + '\n')
+                f.write('SC_index = ' + str(SC) + '\n')
                 f.write('best_score = ' + str(best_score_db) + '\n')
-                f.write(' & ' + str(n_clst_db) + ' & ' + str(round(DB_db, 3)) + ' & ' + str(round(SC_db, 3)) + ' & ' + str(round(best_score_db, 3)) + '\\\\' + '\n\n')
+                f.write(' & ' + str(n_clust) + ' & ' + str(round(DB, 3)) + ' & ' + str(round(SC, 3)) + ' & ' + str(round(best_score_db, 3)) + '\\\\' + '\n\n')

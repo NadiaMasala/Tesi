@@ -1,0 +1,18 @@
+Synthetic dataset for clustering with n_samples=200, n_features=5, n_centers=5 (make_blobs - cluster_std=1.0)
+
+Results from KMeans:
+Number of clusters = 5
+DB_index = 0.9904149664735143
+SC_index = 0.5523058544730628
+best_score = 0.6392803625147189
+ & 5 & 0.99 & 0.552 & 0.639\\
+
+Results from DBSCAN:
+Best hyperparameters = {'eps': 1, 'minpts': 4}
+
+Number of clusters = 3
+DB_index = 0.07539542395827904
+SC_index = 0.9381475578843902
+best_score = 0.9494821448262086
+ & 3 & 0.075 & 0.938 & 0.949\\
+
