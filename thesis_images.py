@@ -4,6 +4,30 @@ from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.preprocessing import StandardScaler
 
+# Media della percentuale dei punti outliers
+# n_out_sph/m  e  n_out_dbscan/m
+# per ogni dataset e poi media per tutti i dataset
+DBSCAN_out_ratio = [2/150, 3/150, 3/150, 115/150, 1, 1, 1, 1, 1, 2/200, 3/200, 2/200, 106/200, 161/200, 192/200, 1, 1, 1, 1/300, 2/300, 3/300, 98/300, 162/300, 232/300, 1, 1, 1]
+Sph_clst_out_ratio = [15/150, 15/150, 14/150, 16/150, 2/150, 0, 11/150, 23/150, 1, 12/200, 15/200, 16/200, 15/200, 11/200, 4/200, 10/200, 59/200, 1, 12/300, 5/300, 1, 12/300, 10/300, 1, 31/300, 58/300, 1]
+
+# media degli outliers trovati
+DBSCAN_out_avg = np.mean(DBSCAN_out_ratio)
+Sph_clst_out_avg = np.mean(Sph_clst_out_ratio)
+
+# percentuale della media di outliers trovati
+DBSCAN_out_perc = 100*DBSCAN_out_avg
+Sph_clst_out_perc = 100*Sph_clst_out_avg
+
+print("DBSCAN_out_avg = "+str(round(DBSCAN_out_avg,3))+"\n")
+print("DBSCAN_out_perc = "+str(round(DBSCAN_out_perc,3))+"\n")
+print("Sph_clst_out_avg = "+str(round(Sph_clst_out_avg,3))+"\n")
+print("Sph_clst_out_perc = "+str(round(Sph_clst_out_perc,3))+"\n")
+
+
+
+
+quit()
+
 # 1. Generazione di un dataset non etichettato con 3 cluster
 X, _ = make_blobs(n_samples=50, centers=3, cluster_std=1.0, random_state=82)
 
